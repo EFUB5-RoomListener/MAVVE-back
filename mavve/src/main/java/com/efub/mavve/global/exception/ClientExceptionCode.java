@@ -1,0 +1,16 @@
+package com.efub.mavve.global.exception;
+
+public enum ClientExceptionCode {
+    LOGIN_ERROR,
+    AUTH_SERVER_ERROR,
+    AUTH_TOKEN_EMPTY,
+    ACCESS_TOKEN_EMPTY,
+    REFRESH_TOKEN_EMPTY,
+    ILLEGAL_ARGUMENT,
+    INTERNAL_SERVER_ERROR,
+
+    ROOM_NOT_FOUND,
+    SONG_NOT_FOUND,
+    PLAYLIST_NOT_FOUND,
+    TITLE_ALREADY_EXIST,
+}
