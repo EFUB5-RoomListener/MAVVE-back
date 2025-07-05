@@ -40,8 +40,8 @@ public class JwtResolver {
 
 
     public void validateTokenByType(Claims claims, String type){
-        String extractTokenType = claims.get(type, String.class);
-        if(!extractTokenType.equals(type)){
+        String extractTokenType = claims.get("type", String.class);
+        if (extractTokenType == null || !extractTokenType.equals(type)) {
             throw new MavveException(ExceptionCode.AUTH_TOKEN_MISMATCH);
         }
     }
