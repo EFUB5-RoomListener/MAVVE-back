@@ -19,6 +19,20 @@ spring:
       host: ${REDIS_HOST}
       port: 6379
 
+jwt:
+  secret:
+    key: ${JWT_SECRET_KEY}
+kakao:
+  token:
+    uri: ${KAKAO_TOKEN_URI}
+  client:
+    id: ${CLIENT_ID}
+  user:
+    info:
+      uri: ${KAKAO_USER_INFO_URI}
+  redirect:
+    uri: ${KAKAO_REDIRECT_URI}
+
 youtube:
   api:
     key: ${YOUTUBE_KEY}
