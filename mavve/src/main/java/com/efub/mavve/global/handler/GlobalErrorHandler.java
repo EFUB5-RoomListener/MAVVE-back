@@ -6,6 +6,8 @@ import com.efub.mavve.global.exception.dto.ExceptionResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -24,6 +26,22 @@ public class GlobalErrorHandler {
         );
         return ResponseEntity.status(e.getHttpStatusCode())
                 .body(response);
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ExceptionResponse> handleMethodArgumentNotValidException(MethodArgumentNotValidException e, HttpServletRequest request) {
+        String errorMessage = "유효하지 않은 입력입니다.";
+        FieldError fieldError = e.getFieldError();
+        if(fieldError != null) {
+            errorMessage = fieldError.getDefaultMessage();
+        }
+        ExceptionResponse response = new ExceptionResponse(
+                HttpStatus.BAD_REQUEST.value(),
+                ExceptionCode.ILLEGAL_ARGUMENT.name(),
+                errorMessage,
+                request.getRequestURI(), ZonedDateTime.now()
+        );
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
     }
 
     @ExceptionHandler(RuntimeException.class)
