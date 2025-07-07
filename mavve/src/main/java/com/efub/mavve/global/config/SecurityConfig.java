@@ -20,6 +20,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
+    private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http, JwtResolver jwtResolver, UserDetailsService userDetailsService) throws Exception {
         http
@@ -32,7 +33,7 @@ public class SecurityConfig {
                                 .anyRequest().authenticated()
                 )
                 .addFilterBefore(
-                        new JwtAuthenticationFilter(jwtResolver, userDetailsService),
+                        new JwtAuthenticationFilter(jwtResolver, userDetailsService, customAuthenticationEntryPoint),
                         UsernamePasswordAuthenticationFilter.class
                 )
                 .csrf(AbstractHttpConfigurer::disable);
