@@ -18,3 +18,7 @@ spring:
     redis:
       host: ${REDIS_HOST}
       port: 6379
+
+youtube:
+  api:
+    key: ${YOUTUBE_KEY}
