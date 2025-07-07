@@ -1,9 +1,11 @@
 package com.efub.mavve.auth.service.jwt;
 
+import com.efub.mavve.global.exception.CustomAuthenticationException;
 import com.efub.mavve.global.exception.ExceptionCode;
 import com.efub.mavve.global.exception.MavveException;
 import io.jsonwebtoken.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Component;
 
 @RequiredArgsConstructor
@@ -31,10 +33,10 @@ public class JwtResolver {
 
             Long userId = Long.parseLong(claims.getSubject());
             return Long.toString(userId);
-        }catch (ExpiredJwtException exception){
-            throw new MavveException(ExceptionCode.AUTH_TOKEN_EXPIRED);
-        }catch (JwtException exception){
-            throw new MavveException(ExceptionCode.AUTH_TOKEN_INVALID);
+        }catch (ExpiredJwtException exception) {
+            throw new CustomAuthenticationException(ExceptionCode.AUTH_TOKEN_EXPIRED, ExceptionCode.AUTH_TOKEN_EXPIRED.getMessage(), exception);
+        } catch (JwtException exception) {
+            throw new CustomAuthenticationException(ExceptionCode.AUTH_TOKEN_INVALID, ExceptionCode.AUTH_TOKEN_INVALID.getMessage(), exception);
         }
     }
 
