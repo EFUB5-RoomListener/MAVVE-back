@@ -4,6 +4,7 @@ import com.efub.mavve.auth.service.jwt.CustomUserDetails;
 import com.efub.mavve.auth.service.jwt.JwtAuthenticationFilter;
 import com.efub.mavve.playlist.domain.Playlist;
 import com.efub.mavve.playlist.dto.request.PlaylistCreateRequest;
+import com.efub.mavve.playlist.dto.request.PlaylistUpdateRequest;
 import com.efub.mavve.playlist.dto.response.PlaylistListResponse;
 import com.efub.mavve.playlist.dto.response.PlaylistResponse;
 import com.efub.mavve.playlist.service.PlaylistService;
@@ -25,7 +26,7 @@ public class PlaylistController {
 
     // 플레이리스트 생성
     @PostMapping
-    public ResponseEntity<PlaylistResponse> createPlaylist (@AuthenticationPrincipal CustomUserDetails userDetails,
+    public ResponseEntity<PlaylistResponse> createPlaylist(@AuthenticationPrincipal CustomUserDetails userDetails,
                                                 @Valid @RequestBody PlaylistCreateRequest request) {
 
         Long userId = userDetails.getUser().getUserId();
@@ -47,6 +48,11 @@ public class PlaylistController {
         return ResponseEntity.ok(playlistService.getAllPlaylists());
     }
 
+    // 플레이리스트 상세 조회
+    @GetMapping("/{playlistId}")
+    public ResponseEntity<PlaylistResponse> getPlaylist(@PathVariable("playlistId") Long playlistId) {
+        return ResponseEntity.ok(playlistService.getPlaylist(playlistId));
+    }
 }
 
 

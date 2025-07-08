@@ -7,6 +7,7 @@ import com.efub.mavve.global.exception.ExceptionCode;
 import com.efub.mavve.global.exception.MavveException;
 import com.efub.mavve.playlist.domain.Playlist;
 import com.efub.mavve.playlist.dto.request.PlaylistCreateRequest;
+import com.efub.mavve.playlist.dto.request.PlaylistUpdateRequest;
 import com.efub.mavve.playlist.dto.response.PlaylistListResponse;
 import com.efub.mavve.playlist.dto.response.PlaylistResponse;
 import com.efub.mavve.playlist.dto.summary.PlaylistSummary;
@@ -51,6 +52,13 @@ public class PlaylistService {
         List<PlaylistSummary> playlistSummaries = playlistRepository.findByOrderByPlaylistIdDesc().stream()
                 .map(PlaylistSummary::from).toList();
         return new PlaylistListResponse(playlistSummaries);
+    }
+
+    // 플레이리스트 상세 조회
+    @Transactional(readOnly = true)
+    public PlaylistResponse getPlaylist(Long playlistId) {
+        Playlist playlist = playlistRepository.findByPlaylistId(playlistId);
+        return PlaylistResponse.from(playlist);
     }
 
 
