@@ -32,4 +32,9 @@ public class Playlist {
         this.playImageUrl = playImageUrl;
     }
 
+    public void changePlaylist(String newName, String newPlayImageUrl){
+        this.name = newName;
+        this.playImageUrl = newPlayImageUrl;
+    }
+
 }

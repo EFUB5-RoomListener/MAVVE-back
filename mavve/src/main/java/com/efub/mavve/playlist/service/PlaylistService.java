@@ -29,13 +29,13 @@ public class PlaylistService {
 
     // 플레이리스트 생성
     @Transactional
-    public Playlist createPlaylist(PlaylistCreateRequest request, Long userId) throws MavveException {
+    public Playlist createPlaylist(PlaylistCreateRequest request, Long userId) {
 
         String name = request.name();
         String playImageUrl = request.playImageUrl();
 
         // 플레이리스트 이름 중복 검사
-        if (playlistRepository.existsByName(name)) {
+        if (!playlistRepository.existsByName(name)) {
             throw new MavveException(ExceptionCode.TITLE_ALREADY_EXIST);
         }
 
@@ -57,9 +57,33 @@ public class PlaylistService {
     // 플레이리스트 상세 조회
     @Transactional(readOnly = true)
     public PlaylistResponse getPlaylist(Long playlistId) {
+        // 플레이리스트 존재 여부 검사
+        if (!playlistRepository.existsById(playlistId)) {
+            throw new MavveException(ExceptionCode.PLAYLIST_NOT_FOUND);
+        }
+
         Playlist playlist = playlistRepository.findByPlaylistId(playlistId);
         return PlaylistResponse.from(playlist);
     }
 
+    // 플레이리스트 수정
+    @Transactional
+    public void updatePlaylist(Long playlistId, PlaylistUpdateRequest request) throws MavveException {
 
+        String name = request.name();
+        String playImageUrl = request.playImageUrl();
+
+        // 플레이리스트 이름 중복 검사
+        if (playlistRepository.existsByName(name)) {
+            throw new MavveException(ExceptionCode.TITLE_ALREADY_EXIST);
+        }
+
+        // 플레이리스트 존재 여부 검사
+        if (!playlistRepository.existsById(playlistId)) {
+            throw new MavveException(ExceptionCode.PLAYLIST_NOT_FOUND);
+        }
+
+        Playlist playlist = playlistRepository.findByPlaylistId(playlistId);
+        playlist.changePlaylist(name, playImageUrl);
+    }
 }

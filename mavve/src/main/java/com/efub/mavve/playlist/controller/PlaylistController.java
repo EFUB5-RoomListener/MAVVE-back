@@ -53,6 +53,23 @@ public class PlaylistController {
     public ResponseEntity<PlaylistResponse> getPlaylist(@PathVariable("playlistId") Long playlistId) {
         return ResponseEntity.ok(playlistService.getPlaylist(playlistId));
     }
+
+    // 플레이리스트 수정
+    @PatchMapping("/{playlistId}")
+    public ResponseEntity<PlaylistResponse> updatePlaylist(@AuthenticationPrincipal CustomUserDetails userDetails,
+                                                            @PathVariable("playlistId") Long playlistId,
+                                                            @Valid @RequestBody PlaylistUpdateRequest request) {
+        Long userId = userDetails.getUser().getUserId();
+        playlistService.updatePlaylist(playlistId, request);
+        return ResponseEntity.ok(playlistService.getPlaylist(playlistId));
+    }
+    @PatchMapping("/dev/{playlistId}")
+    public ResponseEntity<PlaylistResponse> updatePlaylistWithoutAuth(@PathVariable("playlistId") Long playlistId,
+                                                           @Valid @RequestBody PlaylistUpdateRequest request) {
+
+        playlistService.updatePlaylist(playlistId, request);
+        return ResponseEntity.ok(playlistService.getPlaylist(playlistId));
+    }
 }
 
 
