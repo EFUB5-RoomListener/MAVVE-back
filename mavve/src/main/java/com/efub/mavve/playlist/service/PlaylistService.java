@@ -7,11 +7,17 @@ import com.efub.mavve.global.exception.ExceptionCode;
 import com.efub.mavve.global.exception.MavveException;
 import com.efub.mavve.playlist.domain.Playlist;
 import com.efub.mavve.playlist.dto.request.PlaylistCreateRequest;
+import com.efub.mavve.playlist.dto.response.PlaylistListResponse;
+import com.efub.mavve.playlist.dto.response.PlaylistResponse;
+import com.efub.mavve.playlist.dto.summary.PlaylistSummary;
 import com.efub.mavve.playlist.repository.PlaylistRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.efub.mavve.global.exception.ExceptionCode;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -20,6 +26,7 @@ public class PlaylistService {
     private final PlaylistRepository playlistRepository;
     private final UserRepository userRepository;
 
+    // 플레이리스트 생성
     @Transactional
     public Playlist createPlaylist(PlaylistCreateRequest request, Long userId) throws MavveException {
 
@@ -37,4 +44,14 @@ public class PlaylistService {
         Playlist newPlaylist = request.toEntity(user);
         return playlistRepository.save(newPlaylist);
     }
+
+    // 플레이리스트 목록 조회
+    @Transactional(readOnly = true)
+    public PlaylistListResponse getAllPlaylists() {
+        List<PlaylistSummary> playlistSummaries = playlistRepository.findByOrderByPlaylistIdDesc().stream()
+                .map(PlaylistSummary::from).toList();
+        return new PlaylistListResponse(playlistSummaries);
+    }
+
+
 }
