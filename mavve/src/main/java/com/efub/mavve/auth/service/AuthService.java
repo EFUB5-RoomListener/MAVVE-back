@@ -6,11 +6,13 @@ import com.efub.mavve.auth.dto.request.KakaoCodeRequest;
 import com.efub.mavve.auth.dto.response.KakaoUserInfoResponse;
 import com.efub.mavve.auth.repository.UserRepository;
 import com.efub.mavve.auth.service.jwt.JwtProvider;
+import com.efub.mavve.auth.service.jwt.JwtResolver;
 import com.efub.mavve.auth.service.jwt.RefreshTokenService;
 import com.efub.mavve.auth.service.oauth.OauthClient;
 import com.efub.mavve.global.exception.ExceptionCode;
 import com.efub.mavve.global.exception.MavveException;
 import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,6 +31,7 @@ public class AuthService {
     private final OauthClient oauthClient;
 
     private final long REFRESH_EXPIRE = 1000L * 60 * 60 * 24 * 14;
+    private final JwtResolver jwtResolver;
 
     @Transactional
     public void loginOrRegisterUser(KakaoCodeRequest request, HttpServletResponse response){
@@ -45,6 +48,24 @@ public class AuthService {
         }
         // 존재하지 않는 유저이므로 회원가입
         registerKakaoUser(kakaoId, userInfoResponse, response);
+    }
+
+    @Transactional
+    public void reissue(String oldRefreshToken, HttpServletResponse response){
+        if(oldRefreshToken == null){
+            throw new MavveException(ExceptionCode.REFRESH_TOKEN_EMPTY);
+        }
+
+        // 리프레시 토큰에 있는 user id 가져오기
+        String userId = jwtResolver.resolveRefreshToken(oldRefreshToken);
+        // redis에 해당 리프레시 토큰이 없으면 예외 처리
+        if(!refreshTokenService.existsRefreshToken(userId, oldRefreshToken)){
+            throw new MavveException(ExceptionCode.AUTH_TOKEN_INVALID);
+        }
+        User user = getUserByUserId(Long.valueOf(userId));
+
+        // accessToken과 refreshToken 재 발급
+        sendTokens(user, response);
     }
 
 
@@ -64,10 +85,11 @@ public class AuthService {
         sendTokens(user, response);
     }
 
+    // 액세스토큰과 리프레시 토큰 생성 후 각각 헤더와 쿠키에 담아 보냄
     private void sendTokens(User user, HttpServletResponse response){
         String accessToken = jwtProvider.createAccessToken(user);
         String refreshToken = jwtProvider.createRefreshToken(user);
-
+        refreshTokenService.deleteRefreshToken(user.getUserId().toString());
         refreshTokenService.saveRefreshToken(user.getUserId().toString(), refreshToken, REFRESH_EXPIRE);
 
         Cookie cookie = saveRefreshTokenCookie(refreshToken);
@@ -86,6 +108,10 @@ public class AuthService {
 
     private boolean isExistedUser(Long kakaoId) {
         return userRepository.existsByKakaoId(kakaoId);
+    }
+
+    private User getUserByUserId(Long userId){
+        return userRepository.findByUserId(userId).orElseThrow(()->new MavveException(ExceptionCode.USER_NOT_FOUND));
     }
 
 }

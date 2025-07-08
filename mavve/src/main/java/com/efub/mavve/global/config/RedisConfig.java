@@ -15,7 +15,7 @@ public class RedisConfig {
         template.setConnectionFactory(factory);
 
         template.setValueSerializer(new StringRedisSerializer());
-        template.setValueSerializer(new StringRedisSerializer());
+        template.setKeySerializer(new StringRedisSerializer());
 
         return template;
     }
