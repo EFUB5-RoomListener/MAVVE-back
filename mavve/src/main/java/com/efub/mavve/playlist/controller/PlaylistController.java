@@ -16,6 +16,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
+import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -70,6 +71,22 @@ public class PlaylistController {
         playlistService.updatePlaylist(playlistId, request);
         return ResponseEntity.ok(playlistService.getPlaylist(playlistId));
     }
+
+    // 플레이리스트 삭제
+    @DeleteMapping("/{playlistId}")
+    public ResponseEntity<?> deletePlaylist(@AuthenticationPrincipal CustomUserDetails userDetails,
+                                                @PathVariable("playlistId") Long playlistId) {
+        Long userId = userDetails.getUser().getUserId();
+        playlistService.deletePlaylist(playlistId);
+        return ResponseEntity.ok(Map.of("message", "성공적으로 삭제되었습니다."));
+    }
+    @DeleteMapping("/dev/{playlistId}")
+    public ResponseEntity<?> deletePlaylistWithoutAuth(@PathVariable("playlistId") Long playlistId) {
+
+        playlistService.deletePlaylist(playlistId);
+        return ResponseEntity.ok(Map.of("message", "성공적으로 삭제되었습니다."));
+    }
+
 }
 
 

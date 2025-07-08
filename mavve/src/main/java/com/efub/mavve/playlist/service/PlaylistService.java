@@ -57,6 +57,7 @@ public class PlaylistService {
     // 플레이리스트 상세 조회
     @Transactional(readOnly = true)
     public PlaylistResponse getPlaylist(Long playlistId) {
+
         // 플레이리스트 존재 여부 검사
         if (!playlistRepository.existsById(playlistId)) {
             throw new MavveException(ExceptionCode.PLAYLIST_NOT_FOUND);
@@ -68,7 +69,7 @@ public class PlaylistService {
 
     // 플레이리스트 수정
     @Transactional
-    public void updatePlaylist(Long playlistId, PlaylistUpdateRequest request) throws MavveException {
+    public void updatePlaylist(Long playlistId, PlaylistUpdateRequest request) {
 
         String name = request.name();
         String playImageUrl = request.playImageUrl();
@@ -85,5 +86,18 @@ public class PlaylistService {
 
         Playlist playlist = playlistRepository.findByPlaylistId(playlistId);
         playlist.changePlaylist(name, playImageUrl);
+    }
+
+    // 플레이리스트 삭제
+    @Transactional
+    public void deletePlaylist(Long playlistId) {
+
+        // 플레이리스트 존재 여부 검사
+        if (!playlistRepository.existsById(playlistId)) {
+            throw new MavveException(ExceptionCode.PLAYLIST_NOT_FOUND);
+        }
+
+        Playlist playlist = playlistRepository.findByPlaylistId(playlistId);
+        playlistRepository.delete(playlist);
     }
 }
