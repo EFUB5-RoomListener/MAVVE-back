@@ -69,7 +69,7 @@ public class PlaylistService {
 
     // 플레이리스트 수정
     @Transactional
-    public void updatePlaylist(Long playlistId, PlaylistUpdateRequest request) {
+    public void updatePlaylist(Long playlistId, PlaylistUpdateRequest request, User user) {
 
         String name = request.name();
         String playImageUrl = request.playImageUrl();
@@ -85,12 +85,13 @@ public class PlaylistService {
         }
 
         Playlist playlist = playlistRepository.findByPlaylistId(playlistId);
+        validatePlaylistOwner(playlist, user);
         playlist.changePlaylist(name, playImageUrl);
     }
 
     // 플레이리스트 삭제
     @Transactional
-    public void deletePlaylist(Long playlistId) {
+    public void deletePlaylist(Long playlistId, User user) {
 
         // 플레이리스트 존재 여부 검사
         if (!playlistRepository.existsById(playlistId)) {
@@ -98,6 +99,15 @@ public class PlaylistService {
         }
 
         Playlist playlist = playlistRepository.findByPlaylistId(playlistId);
+        validatePlaylistOwner(playlist, user);
         playlistRepository.delete(playlist);
     }
+
+    // 로그인한 사용자와 플레이리스트 소유자가 같은지 확인
+    private void validatePlaylistOwner(Playlist playlist, User user) {
+        if (!playlist.getUser().getUserId().equals(user.getUserId())) {
+            throw new MavveException(ExceptionCode.AUTH_TOKEN_MISMATCH);
+        }
+    }
+
 }

@@ -1,5 +1,6 @@
 package com.efub.mavve.playlist.controller;
 
+import com.efub.mavve.auth.domain.User;
 import com.efub.mavve.auth.service.jwt.CustomUserDetails;
 import com.efub.mavve.auth.service.jwt.JwtAuthenticationFilter;
 import com.efub.mavve.playlist.domain.Playlist;
@@ -27,21 +28,20 @@ public class PlaylistController {
 
     // 플레이리스트 생성
     @PostMapping
-    public ResponseEntity<PlaylistResponse> createPlaylist(@AuthenticationPrincipal CustomUserDetails userDetails,
+    public ResponseEntity<PlaylistResponse> createPlaylist(@AuthenticationPrincipal User user,
                                                 @Valid @RequestBody PlaylistCreateRequest request) {
 
-        Long userId = userDetails.getUser().getUserId();
-        Playlist playlist = playlistService.createPlaylist(request, userId);
+        Playlist playlist = playlistService.createPlaylist(request, user.getUserId());
         PlaylistResponse response = PlaylistResponse.from(playlist);
         return ResponseEntity.created(URI.create("/playlists/" + playlist.getPlaylistId())).body(response);
     }
-    @PostMapping("/dev")
-    public ResponseEntity<PlaylistResponse> createPlaylistWithoutAuth(@RequestHeader("Auth-Id") Long userId,
-                                                                      @Valid @RequestBody PlaylistCreateRequest request) {
-        Playlist playlist = playlistService.createPlaylist(request, userId);
-        PlaylistResponse response = PlaylistResponse.from(playlist);
-        return ResponseEntity.created(URI.create("/playlists/" + playlist.getPlaylistId())).body(response);
-    }
+//    @PostMapping("/dev")
+//    public ResponseEntity<PlaylistResponse> createPlaylistWithoutAuth(@RequestHeader("Auth-Id") Long userId,
+//                                                                      @Valid @RequestBody PlaylistCreateRequest request) {
+//        Playlist playlist = playlistService.createPlaylist(request, userId);
+//        PlaylistResponse response = PlaylistResponse.from(playlist);
+//        return ResponseEntity.created(URI.create("/playlists/" + playlist.getPlaylistId())).body(response);
+//    }
 
     // 플레이리스트 목록 조회
     @GetMapping("/me")
@@ -57,36 +57,34 @@ public class PlaylistController {
 
     // 플레이리스트 수정
     @PatchMapping("/{playlistId}")
-    public ResponseEntity<PlaylistResponse> updatePlaylist(@AuthenticationPrincipal CustomUserDetails userDetails,
+    public ResponseEntity<PlaylistResponse> updatePlaylist(@AuthenticationPrincipal User user,
                                                             @PathVariable("playlistId") Long playlistId,
                                                             @Valid @RequestBody PlaylistUpdateRequest request) {
-        Long userId = userDetails.getUser().getUserId();
-        playlistService.updatePlaylist(playlistId, request);
-        return ResponseEntity.ok(playlistService.getPlaylist(playlistId));
-    }
-    @PatchMapping("/dev/{playlistId}")
-    public ResponseEntity<PlaylistResponse> updatePlaylistWithoutAuth(@PathVariable("playlistId") Long playlistId,
-                                                           @Valid @RequestBody PlaylistUpdateRequest request) {
 
-        playlistService.updatePlaylist(playlistId, request);
+        playlistService.updatePlaylist(playlistId, request, user);
         return ResponseEntity.ok(playlistService.getPlaylist(playlistId));
     }
+//    @PatchMapping("/dev/{playlistId}")
+//    public ResponseEntity<PlaylistResponse> updatePlaylistWithoutAuth(@PathVariable("playlistId") Long playlistId,
+//                                                           @Valid @RequestBody PlaylistUpdateRequest request) {
+//
+//        playlistService.updatePlaylist(playlistId, request);
+//        return ResponseEntity.ok(playlistService.getPlaylist(playlistId));
+//    }
 
     // 플레이리스트 삭제
     @DeleteMapping("/{playlistId}")
-    public ResponseEntity<?> deletePlaylist(@AuthenticationPrincipal CustomUserDetails userDetails,
+    public ResponseEntity<?> deletePlaylist(@AuthenticationPrincipal User user,
                                                 @PathVariable("playlistId") Long playlistId) {
-        Long userId = userDetails.getUser().getUserId();
-        playlistService.deletePlaylist(playlistId);
-        return ResponseEntity.ok(Map.of("message", "성공적으로 삭제되었습니다."));
-    }
-    @DeleteMapping("/dev/{playlistId}")
-    public ResponseEntity<?> deletePlaylistWithoutAuth(@PathVariable("playlistId") Long playlistId) {
 
-        playlistService.deletePlaylist(playlistId);
+        playlistService.deletePlaylist(playlistId, user);
         return ResponseEntity.ok(Map.of("message", "성공적으로 삭제되었습니다."));
     }
+//    @DeleteMapping("/dev/{playlistId}")
+//    public ResponseEntity<?> deletePlaylistWithoutAuth(@PathVariable("playlistId") Long playlistId) {
+//
+//        playlistService.deletePlaylist(playlistId);
+//        return ResponseEntity.ok(Map.of("message", "성공적으로 삭제되었습니다."));
+//    }
 
 }
-
-
