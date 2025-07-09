@@ -6,7 +6,7 @@ import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public class KakaoCodeRequest {
+public class SpotifyCodeRequest {
     @NotBlank(message = "인가코드가 필요합니다.")
     private final String code;
 }

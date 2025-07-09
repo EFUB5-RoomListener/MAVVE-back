@@ -24,18 +24,18 @@ public class User {
     private String userImageUrl;
 
     @Column(nullable = false)
-    private Long kakaoId;
+    private String spotifyUserId;
 
     @Builder
-    public User(String username, Long kakaoId) {
+    public User(String username, String spotifyUserId) {
         this.username = username;
-        this.kakaoId =  kakaoId;
+        this.spotifyUserId = spotifyUserId;
     }
 
-    public static User fromKakaoInfo(String username, Long kakaoId) {
+    public static User fromSpotifyInfo(String spotifyNickname, String spotifyUserId) {
         return User.builder()
-                .username(username)
-                .kakaoId(kakaoId)
+                .username(spotifyNickname)
+                .spotifyUserId(spotifyUserId)
                 .build();
     }
 }

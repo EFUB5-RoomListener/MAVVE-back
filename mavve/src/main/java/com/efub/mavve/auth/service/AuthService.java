@@ -1,18 +1,18 @@
 package com.efub.mavve.auth.service;
 
-import com.efub.mavve.MavveApplication;
 import com.efub.mavve.auth.domain.User;
-import com.efub.mavve.auth.dto.request.KakaoCodeRequest;
-import com.efub.mavve.auth.dto.response.KakaoUserInfoResponse;
+import com.efub.mavve.auth.dto.request.SpotifyCodeRequest;
+import com.efub.mavve.auth.dto.response.SpotifyRedirctUri;
+import com.efub.mavve.auth.dto.response.SpotifyUserInfoResponse;
 import com.efub.mavve.auth.repository.UserRepository;
 import com.efub.mavve.auth.service.jwt.JwtProvider;
 import com.efub.mavve.auth.service.jwt.JwtResolver;
 import com.efub.mavve.auth.service.jwt.RefreshTokenService;
+import com.efub.mavve.auth.service.jwt.SpotifyTokenService;
 import com.efub.mavve.auth.service.oauth.OauthClient;
 import com.efub.mavve.global.exception.ExceptionCode;
 import com.efub.mavve.global.exception.MavveException;
 import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,26 +28,28 @@ public class AuthService {
     private final UserRepository userRepository;
     private final JwtProvider jwtProvider;
     private final RefreshTokenService refreshTokenService;
+    private final SpotifyTokenService  spotifyTokenService;
     private final OauthClient oauthClient;
 
     private final long REFRESH_EXPIRE = 1000L * 60 * 60 * 24 * 14;
     private final JwtResolver jwtResolver;
 
+    public SpotifyRedirctUri getRedirctUri() {
+        return SpotifyRedirctUri.of(oauthClient.getRedirectUri());
+    }
+
     @Transactional
-    public void loginOrRegisterUser(KakaoCodeRequest request, HttpServletResponse response){
+    public void loginOrRegisterUser(SpotifyCodeRequest request, HttpServletResponse response){
         String code = request.getCode();
+        SpotifyUserInfoResponse userInfoResponse = oauthClient.requestOauthInfo(code);
 
-        KakaoUserInfoResponse userInfoResponse = oauthClient.requestOauthInfo(code);
-        Long kakaoId = userInfoResponse.getId();
-
-
-        if(isExistedUser(kakaoId)){
+        if(existedBySpotifyUserId(userInfoResponse.getId())){
             // 존재하는 유저이므로 로그인
-            kakaoLogin(kakaoId, response);
+            spotifyLogin(userInfoResponse, response);
             return;
         }
         // 존재하지 않는 유저이므로 회원가입
-        registerKakaoUser(kakaoId, userInfoResponse, response);
+        registerKakaoUser(userInfoResponse, response);
     }
 
     @Transactional
@@ -69,20 +71,31 @@ public class AuthService {
     }
 
 
-    private void kakaoLogin(Long kakaoId, HttpServletResponse response){
-        User user = userRepository.findByKakaoId(kakaoId)
+    private void spotifyLogin(SpotifyUserInfoResponse userInfoResponse, HttpServletResponse response){
+        String spotifyUserId = userInfoResponse.getId();
+        User user = userRepository.findBySpotifyUserId(spotifyUserId)
                 .orElseThrow(()-> new MavveException(ExceptionCode.USER_NOT_FOUND));
         log.info("로그인한 유저 : {}", user.getUsername());
-        sendTokens(user, response);
-
+        sendTokens(user, response); // 우리 서비스 기반 토큰 발급 및 저장
+        saveSpotifyTokens(user.getUserId(), userInfoResponse);
     }
 
-    private void registerKakaoUser(Long kakaoId, KakaoUserInfoResponse userInfoResponse, HttpServletResponse response){
-        String username = userInfoResponse.getKakao_account().getProfile().getNickname();
-        User user = User.fromKakaoInfo(username, kakaoId);
+    private void registerKakaoUser(SpotifyUserInfoResponse userInfoResponse, HttpServletResponse response){
+        String username = userInfoResponse.getDisplay_name();
+        String spotifyUserId = userInfoResponse.getId();
+        User user = User.fromSpotifyInfo(username, spotifyUserId);
         log.info("회원가입한 유저: {}", username);
         userRepository.save(user);
         sendTokens(user, response);
+        saveSpotifyTokens(user.getUserId(), userInfoResponse);
+    }
+
+    private void saveSpotifyTokens(Long userId, SpotifyUserInfoResponse spotifyUserInfoResponse){
+        String spotifyAccessToken = spotifyUserInfoResponse.getToken().getAccess_token();
+        String spotifyRefreshToken = spotifyUserInfoResponse.getToken().getRefresh_token();
+        String userIdStr = Long.toString(userId);
+        spotifyTokenService.saveAccessToken(userIdStr, spotifyAccessToken);
+        spotifyTokenService.saveRefreshToken(userIdStr, spotifyRefreshToken);
     }
 
     // 액세스토큰과 리프레시 토큰 생성 후 각각 헤더와 쿠키에 담아 보냄
@@ -106,8 +119,8 @@ public class AuthService {
         return refreshTokenCookie;
     }
 
-    private boolean isExistedUser(Long kakaoId) {
-        return userRepository.existsByKakaoId(kakaoId);
+    private boolean existedBySpotifyUserId(String spotifyUserId){
+        return userRepository.existsBySpotifyUserId(spotifyUserId);
     }
 
     private User getUserByUserId(Long userId){
