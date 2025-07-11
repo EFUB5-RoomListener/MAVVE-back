@@ -15,6 +15,8 @@ public enum ClientExceptionCode {
 
     ROOM_NOT_FOUND,
     SONG_NOT_FOUND,
+    ILLEGAL_PAGE_NUMBER,
+    ILLEGAL_PAGE_SIZE,
     PLAYLIST_NOT_FOUND,
     TITLE_ALREADY_EXIST,
 
