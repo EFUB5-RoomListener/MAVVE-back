@@ -12,12 +12,12 @@ import java.util.List;
 @Builder
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class DeleteSongResponse {
-    String type;
+    MessageType type;
     List<String> songIds;
 
     public static DeleteSongResponse from(List<String> songIds) {
         return DeleteSongResponse.builder()
-                .type("DELETE_SONG")
+                .type(MessageType.DELETE_SONG)
                 .songIds(songIds)
                 .build();
     }

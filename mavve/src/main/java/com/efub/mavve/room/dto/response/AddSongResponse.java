@@ -10,12 +10,12 @@ import lombok.Getter;
 @Builder
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class AddSongResponse {
-    String type;
+    MessageType type;
     SongSummary song;
 
     public static AddSongResponse from(SongSummary song) {
         return AddSongResponse.builder()
-                .type("ADD_SONG")
+                .type(MessageType.ADD_SONG)
                 .song(song)
                 .build();
     }
