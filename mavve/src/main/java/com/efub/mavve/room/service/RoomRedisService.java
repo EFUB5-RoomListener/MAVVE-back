@@ -15,7 +15,6 @@ import java.util.List;
 public class RoomRedisService {
 
     private final RedisTemplate<String, Object> objectRedisTemplate;
-
     private static final String SONGLIST_PREFIX = "room:";
 
     // 노래 추가
@@ -36,5 +35,17 @@ public class RoomRedisService {
             }
         }
         return result;
+    }
+
+    //노래 리스트 삭제
+    public void deleteSongsInRoom(Long roomCode, List<String> songIdsToRemove) {
+        String key = SONGLIST_PREFIX + roomCode + ":songs";
+        List<SongSummary> songsInRoom = getSongsInRoom(roomCode);
+
+        for(SongSummary songSummary: songsInRoom){
+            if(songIdsToRemove.contains(songSummary.getSongId())){
+                objectRedisTemplate.opsForList().remove(key, 1, songSummary);   //1개 삭제
+            }
+        }
     }
 }

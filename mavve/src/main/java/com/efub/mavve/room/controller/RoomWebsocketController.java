@@ -1,7 +1,9 @@
 package com.efub.mavve.room.controller;
 
 import com.efub.mavve.room.dto.request.AddSongRequest;
+import com.efub.mavve.room.dto.request.DeleteSongRequest;
 import com.efub.mavve.room.dto.response.AddSongResponse;
+import com.efub.mavve.room.dto.response.DeleteSongResponse;
 import com.efub.mavve.room.service.RoomWebsocketService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
@@ -19,6 +21,12 @@ public class RoomWebsocketController {
     @MessageMapping("/rooms/{roomCode}/add-song")
     public void addSong(@DestinationVariable Long roomCode, @Payload AddSongRequest request) {
         AddSongResponse response = roomWebsocketService.addSong(roomCode, request);
+        messagingTemplate.convertAndSend("/topic/rooms/" + roomCode, response);
+    }
+
+    @MessageMapping("/rooms/{roomCode}/delete-song")
+    public void deleteSongs(@DestinationVariable Long roomCode, @Payload DeleteSongRequest request){
+        DeleteSongResponse response = roomWebsocketService.deleteSongs(roomCode, request);
         messagingTemplate.convertAndSend("/topic/rooms/" + roomCode, response);
     }
 }
