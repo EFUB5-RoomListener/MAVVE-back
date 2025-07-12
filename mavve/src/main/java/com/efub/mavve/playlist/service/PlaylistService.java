@@ -29,7 +29,7 @@ public class PlaylistService {
 
     // 플레이리스트 생성
     @Transactional
-    public Playlist createPlaylist(PlaylistCreateRequest request, Long userId) {
+    public Playlist createPlaylist(PlaylistCreateRequest request, User user) {
 
         String name = request.name();
         String playImageUrl = request.playImageUrl();
@@ -38,9 +38,6 @@ public class PlaylistService {
         if (!playlistRepository.existsByName(name)) {
             throw new MavveException(ExceptionCode.TITLE_ALREADY_EXIST);
         }
-
-        User user = userRepository.findByKakaoId(userId)
-                .orElseThrow(() -> new MavveException(ExceptionCode.USER_NOT_FOUND));
 
         Playlist newPlaylist = request.toEntity(user);
         return playlistRepository.save(newPlaylist);
@@ -58,12 +55,7 @@ public class PlaylistService {
     @Transactional(readOnly = true)
     public PlaylistResponse getPlaylist(Long playlistId) {
 
-        // 플레이리스트 존재 여부 검사
-        if (!playlistRepository.existsById(playlistId)) {
-            throw new MavveException(ExceptionCode.PLAYLIST_NOT_FOUND);
-        }
-
-        Playlist playlist = playlistRepository.findByPlaylistId(playlistId);
+        Playlist playlist = getPlaylistOrThrow(playlistId);
         return PlaylistResponse.from(playlist);
     }
 
@@ -79,12 +71,7 @@ public class PlaylistService {
             throw new MavveException(ExceptionCode.TITLE_ALREADY_EXIST);
         }
 
-        // 플레이리스트 존재 여부 검사
-        if (!playlistRepository.existsById(playlistId)) {
-            throw new MavveException(ExceptionCode.PLAYLIST_NOT_FOUND);
-        }
-
-        Playlist playlist = playlistRepository.findByPlaylistId(playlistId);
+        Playlist playlist = getPlaylistOrThrow(playlistId);
         validatePlaylistOwner(playlist, user);
         playlist.changePlaylist(name, playImageUrl);
     }
@@ -93,12 +80,7 @@ public class PlaylistService {
     @Transactional
     public void deletePlaylist(Long playlistId, User user) {
 
-        // 플레이리스트 존재 여부 검사
-        if (!playlistRepository.existsById(playlistId)) {
-            throw new MavveException(ExceptionCode.PLAYLIST_NOT_FOUND);
-        }
-
-        Playlist playlist = playlistRepository.findByPlaylistId(playlistId);
+        Playlist playlist = getPlaylistOrThrow(playlistId);
         validatePlaylistOwner(playlist, user);
         playlistRepository.delete(playlist);
     }
@@ -109,5 +91,12 @@ public class PlaylistService {
             throw new MavveException(ExceptionCode.AUTH_TOKEN_MISMATCH);
         }
     }
+
+    // 플레이리스트 존재 여부 검사
+    private Playlist getPlaylistOrThrow(Long playlistId) {
+        return playlistRepository.findById(playlistId)
+                .orElseThrow(() -> new MavveException(ExceptionCode.PLAYLIST_NOT_FOUND));
+    }
+
 
 }

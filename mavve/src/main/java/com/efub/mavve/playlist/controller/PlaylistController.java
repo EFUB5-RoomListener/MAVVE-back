@@ -31,17 +31,10 @@ public class PlaylistController {
     public ResponseEntity<PlaylistResponse> createPlaylist(@AuthenticationPrincipal User user,
                                                 @Valid @RequestBody PlaylistCreateRequest request) {
 
-        Playlist playlist = playlistService.createPlaylist(request, user.getUserId());
+        Playlist playlist = playlistService.createPlaylist(request, user);
         PlaylistResponse response = PlaylistResponse.from(playlist);
         return ResponseEntity.created(URI.create("/playlists/" + playlist.getPlaylistId())).body(response);
     }
-//    @PostMapping("/dev")
-//    public ResponseEntity<PlaylistResponse> createPlaylistWithoutAuth(@RequestHeader("Auth-Id") Long userId,
-//                                                                      @Valid @RequestBody PlaylistCreateRequest request) {
-//        Playlist playlist = playlistService.createPlaylist(request, userId);
-//        PlaylistResponse response = PlaylistResponse.from(playlist);
-//        return ResponseEntity.created(URI.create("/playlists/" + playlist.getPlaylistId())).body(response);
-//    }
 
     // 플레이리스트 목록 조회
     @GetMapping("/me")
@@ -64,13 +57,6 @@ public class PlaylistController {
         playlistService.updatePlaylist(playlistId, request, user);
         return ResponseEntity.ok(playlistService.getPlaylist(playlistId));
     }
-//    @PatchMapping("/dev/{playlistId}")
-//    public ResponseEntity<PlaylistResponse> updatePlaylistWithoutAuth(@PathVariable("playlistId") Long playlistId,
-//                                                           @Valid @RequestBody PlaylistUpdateRequest request) {
-//
-//        playlistService.updatePlaylist(playlistId, request);
-//        return ResponseEntity.ok(playlistService.getPlaylist(playlistId));
-//    }
 
     // 플레이리스트 삭제
     @DeleteMapping("/{playlistId}")
@@ -80,11 +66,5 @@ public class PlaylistController {
         playlistService.deletePlaylist(playlistId, user);
         return ResponseEntity.ok(Map.of("message", "성공적으로 삭제되었습니다."));
     }
-//    @DeleteMapping("/dev/{playlistId}")
-//    public ResponseEntity<?> deletePlaylistWithoutAuth(@PathVariable("playlistId") Long playlistId) {
-//
-//        playlistService.deletePlaylist(playlistId);
-//        return ResponseEntity.ok(Map.of("message", "성공적으로 삭제되었습니다."));
-//    }
 
 }
