@@ -7,13 +7,11 @@ import com.efub.mavve.room.dto.response.DeleteSongResponse;
 import com.efub.mavve.room.dto.response.NextSongResponse;
 import com.efub.mavve.room.dto.summary.SongSummary;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 
@@ -41,12 +39,12 @@ public class RoomWebsocketService {
         SongSummary nextSong = roomRedisService.getNextSong(roomCode, currentSong);
 
         taskScheduler.schedule(() -> {
-            braodCastNextSong(roomCode, nextSong, nextSongStartTime);
+            broadCastNextSong(roomCode, nextSong, nextSongStartTime);
         }, Instant.from(nextSongStartTime));
     }
 
     // 다음 노래 전환 브로드캐스트
-    private void braodCastNextSong(Long roomCode, SongSummary nextSong, LocalDateTime startTime){
+    private void broadCastNextSong(Long roomCode, SongSummary nextSong, LocalDateTime startTime){
         roomRedisService.addCurrentSong(roomCode, nextSong, startTime);
         messagingTemplate.convertAndSend("/topic/room/" + roomCode, NextSongResponse.from(nextSong));
     }
