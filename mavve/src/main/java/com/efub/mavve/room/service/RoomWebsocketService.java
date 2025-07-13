@@ -4,15 +4,25 @@ import com.efub.mavve.room.dto.request.AddSongRequest;
 import com.efub.mavve.room.dto.request.DeleteSongRequest;
 import com.efub.mavve.room.dto.response.AddSongResponse;
 import com.efub.mavve.room.dto.response.DeleteSongResponse;
+import com.efub.mavve.room.dto.response.NextSongResponse;
+import com.efub.mavve.room.dto.summary.SongSummary;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.messaging.simp.SimpMessageSendingOperations;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.stereotype.Service;
+
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 
 @Service
 @RequiredArgsConstructor
 public class RoomWebsocketService {
     private final RoomRedisService roomRedisService;
+    private final SimpMessageSendingOperations messagingTemplate;
+    private final ThreadPoolTaskScheduler taskScheduler;
 
     public AddSongResponse addSong(Long roomCode, AddSongRequest request) {
         //TODO: 노래검색 함수 생성 후 검색한 노래로 수정
@@ -23,5 +33,21 @@ public class RoomWebsocketService {
     public DeleteSongResponse deleteSongs(Long roomCode, DeleteSongRequest request) {
         roomRedisService.deleteSongsInRoom(roomCode, request.getSongIds());
         return DeleteSongResponse.from(request.getSongIds());
+    }
+
+    // 다음 노래 예약 스케쥴링
+    private void scheduleNextSong(Long roomCode, SongSummary currentSong){
+        LocalDateTime nextSongStartTime = LocalDateTime.now().plusSeconds(currentSong.getDuration());
+        SongSummary nextSong = roomRedisService.getNextSong(roomCode, currentSong);
+
+        taskScheduler.schedule(() -> {
+            braodCastNextSong(roomCode, nextSong, nextSongStartTime);
+        }, Instant.from(nextSongStartTime));
+    }
+
+    // 다음 노래 전환 브로드캐스트
+    private void braodCastNextSong(Long roomCode, SongSummary nextSong, LocalDateTime startTime){
+        roomRedisService.addCurrentSong(roomCode, nextSong, startTime);
+        messagingTemplate.convertAndSend("/topic/room/" + roomCode, NextSongResponse.from(nextSong));
     }
 }
