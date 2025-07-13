@@ -15,7 +15,10 @@ public class Song {
     Long songId;
 
     @Column(nullable = false)
-    Long spotifySongId;
+    String spotifySongId;
+
+    @Column(nullable = false)
+    String album;
 
     @Column(nullable = false)
     String title;

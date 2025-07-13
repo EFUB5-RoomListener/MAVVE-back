@@ -18,6 +18,11 @@ spring:
     redis:
       host: ${REDIS_HOST}
       port: 6379
+  web:
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
 jwt:
   secret:
     key: ${JWT_SECRET_KEY}
@@ -44,3 +49,8 @@ spotify:
   auth-uri: https://accounts.spotify.com/authorize
   token-uri: https://accounts.spotify.com/api/token
   user-info-uri: https://api.spotify.com/v1/me
+  search-uri: https://api.spotify.com/v1/search
+server:
+  tomcat:
+    uri-encoding: UTF-8
+
