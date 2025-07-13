@@ -1,6 +1,7 @@
 package com.efub.mavve.global.exception;
 
 import lombok.Getter;
+import org.springframework.boot.autoconfigure.graphql.GraphQlProperties;
 import org.springframework.http.HttpStatus;
 
 @Getter
@@ -22,13 +23,19 @@ public enum ExceptionCode {
 
     ROOM_NOT_FOUND(HttpStatus.NOT_FOUND, ClientExceptionCode.ROOM_NOT_FOUND, "해당되는 방이 존재하지 않습니다."),
     SONG_NOT_FOUND(HttpStatus.NOT_FOUND, ClientExceptionCode.SONG_NOT_FOUND, "해당되는 노래가 존재하지 않습니다."),
+    SONG_LIST_EMPTY(HttpStatus.NO_CONTENT, ClientExceptionCode.SONG_LIST_EMPTY, "해당 방의 노래리스트가 비어있습니다."),
     PLAYLIST_NOT_FOUND(HttpStatus.NOT_FOUND, ClientExceptionCode.PLAYLIST_NOT_FOUND, "해당되는 플레이리스트가 존재하지 않습니다."),
     TITLE_ALREADY_EXIST(HttpStatus.CONFLICT, ClientExceptionCode.TITLE_ALREADY_EXIST, "이미 존재하는 이름의 플레이리스트입니다."),
 
     //이미지
     IMAGE_UPLOAD_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, ClientExceptionCode.IMAGE_UPLOAD_FAILED, "이미지 업로드에 실패하였습니다."),
     NO_FILE_PROVIDED(HttpStatus.BAD_REQUEST, ClientExceptionCode.NO_FILE_PROVIDED, "이미지가 존재하지 않습니다."),
-    INVALID_IMAGE_EXTENSION(HttpStatus.BAD_REQUEST, ClientExceptionCode.INVALID_IMAGE_EXTENSION, "이미지의 확장자가 jpg, jpeg, png, webp 중 하나가 아닙니다.");
+    INVALID_IMAGE_EXTENSION(HttpStatus.BAD_REQUEST, ClientExceptionCode.INVALID_IMAGE_EXTENSION, "이미지의 확장자가 jpg, jpeg, png, webp 중 하나가 아닙니다."),
+
+    //redis
+    REDIS_SAVE_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, ClientExceptionCode.REDIS_SAVE_ERROR, "노래 저장 중 예상치 못한 에러가 발생했습니다."),
+    REDIS_DELETE_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, ClientExceptionCode.REDIS_DELETE_ERROR, "노래 삭제 중 예상치 못한 에러가 발생했습니다."),
+    REDIS_DESERIALIZATION_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, ClientExceptionCode.REDIS_DESERIALIZATION_ERROR, "Redis값 역직렬화에 실패했습니다.");
 
     private final HttpStatus httpStatus;
     private final ClientExceptionCode clientExceptionCode;

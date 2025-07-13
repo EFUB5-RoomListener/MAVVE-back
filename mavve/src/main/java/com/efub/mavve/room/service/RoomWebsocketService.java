@@ -38,13 +38,14 @@ public class RoomWebsocketService {
         LocalDateTime nextSongStartTime = LocalDateTime.now().plusSeconds(currentSong.getDuration());
         SongSummary nextSong = roomRedisService.getNextSong(roomCode, currentSong);
 
+        //TODO: 다음노래 예약해놓았는데, 해당 노래 삭제한 경우 다음 노래 변환 로직 추가
         taskScheduler.schedule(() -> {
-            broadCastNextSong(roomCode, nextSong, nextSongStartTime);
+            broadcastNextSong(roomCode, nextSong, nextSongStartTime);
         }, Instant.from(nextSongStartTime));
     }
 
     // 다음 노래 전환 브로드캐스트
-    private void broadCastNextSong(Long roomCode, SongSummary nextSong, LocalDateTime startTime){
+    private void broadcastNextSong(Long roomCode, SongSummary nextSong, LocalDateTime startTime){
         roomRedisService.addCurrentSong(roomCode, nextSong, startTime);
         messagingTemplate.convertAndSend("/topic/room/" + roomCode, NextSongResponse.from(nextSong));
     }
