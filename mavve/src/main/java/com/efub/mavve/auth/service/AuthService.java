@@ -2,8 +2,10 @@ package com.efub.mavve.auth.service;
 
 import com.efub.mavve.auth.domain.User;
 import com.efub.mavve.auth.dto.request.SpotifyCodeRequest;
+import com.efub.mavve.auth.dto.request.UserInfoRequest;
 import com.efub.mavve.auth.dto.response.SpotifyRedirctUri;
 import com.efub.mavve.auth.dto.response.SpotifyUserInfoResponse;
+import com.efub.mavve.auth.dto.response.UserInfoResponse;
 import com.efub.mavve.auth.repository.UserRepository;
 import com.efub.mavve.auth.service.jwt.JwtProvider;
 import com.efub.mavve.auth.service.jwt.JwtResolver;
@@ -50,6 +52,20 @@ public class AuthService {
         }
         // 존재하지 않는 유저이므로 회원가입
         registerKakaoUser(userInfoResponse, response);
+    }
+
+    @Transactional(readOnly = true)
+    public UserInfoResponse getUserInfo(User user) {
+        return UserInfoResponse.fromUserEntity(user);
+    }
+
+    @Transactional
+    public UserInfoResponse updateUserInfo(User user, UserInfoRequest userInfoRequest) {
+        User updateUser = getUserByUserId(user.getUserId());
+        String newUsername = userInfoRequest.getNickname();
+        String newProfileImageUrl = userInfoRequest.getProfile();
+        updateUser.updateProfile(newUsername, newProfileImageUrl);
+        return UserInfoResponse.fromUserEntity(updateUser);
     }
 
     @Transactional
