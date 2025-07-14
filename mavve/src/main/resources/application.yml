@@ -18,19 +18,14 @@ spring:
     redis:
       host: ${REDIS_HOST}
       port: 6379
+  web:
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
 jwt:
   secret:
     key: ${JWT_SECRET_KEY}
-kakao:
-  token:
-    uri: ${KAKAO_TOKEN_URI}
-  client:
-    id: ${CLIENT_ID}
-  user:
-    info:
-      uri: ${KAKAO_USER_INFO_URI}
-  redirect:
-    uri: ${KAKAO_REDIRECT_URI}
 
 youtube:
   api:
@@ -47,3 +42,15 @@ cloud:
       secret-key: ${AWS_SECRET_KEY}
     stack:
       auto: false
+spotify:
+  client-id: ${CLIENT_ID}
+  client-secret: ${CLIENT_SECRET}
+  redirect-uri: http://127.0.0.1:8080/login/oauth2/code/spotify
+  auth-uri: https://accounts.spotify.com/authorize
+  token-uri: https://accounts.spotify.com/api/token
+  user-info-uri: https://api.spotify.com/v1/me
+  search-uri: https://api.spotify.com/v1/search
+server:
+  tomcat:
+    uri-encoding: UTF-8
+

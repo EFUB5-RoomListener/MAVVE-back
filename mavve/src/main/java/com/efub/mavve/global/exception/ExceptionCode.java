@@ -22,8 +22,12 @@ public enum ExceptionCode {
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, ClientExceptionCode.USER_NOT_FOUND, "찾을 수 없는 유저입니다."),
 
     ROOM_NOT_FOUND(HttpStatus.NOT_FOUND, ClientExceptionCode.ROOM_NOT_FOUND, "해당되는 방이 존재하지 않습니다."),
+
+    // 노래
     SONG_NOT_FOUND(HttpStatus.NOT_FOUND, ClientExceptionCode.SONG_NOT_FOUND, "해당되는 노래가 존재하지 않습니다."),
     SONG_LIST_EMPTY(HttpStatus.NO_CONTENT, ClientExceptionCode.SONG_LIST_EMPTY, "해당 방의 노래리스트가 비어있습니다."),
+    ILLEGAL_PAGE_NUMBER(HttpStatus.BAD_REQUEST, ClientExceptionCode.ILLEGAL_PAGE_NUMBER, "잘못된 페이지 넘버입니다."),
+    ILLEGAL_PAGE_SIZE(HttpStatus.BAD_REQUEST, ClientExceptionCode.ILLEGAL_PAGE_SIZE, "잘못된 페이지 사이즈입니다."),
     PLAYLIST_NOT_FOUND(HttpStatus.NOT_FOUND, ClientExceptionCode.PLAYLIST_NOT_FOUND, "해당되는 플레이리스트가 존재하지 않습니다."),
     TITLE_ALREADY_EXIST(HttpStatus.CONFLICT, ClientExceptionCode.TITLE_ALREADY_EXIST, "이미 존재하는 이름의 플레이리스트입니다."),
 

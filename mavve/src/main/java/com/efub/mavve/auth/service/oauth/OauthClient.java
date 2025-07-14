@@ -1,7 +1,6 @@
 package com.efub.mavve.auth.service.oauth;
 
-import com.efub.mavve.auth.dto.response.KakaoTokenResponse;
-import com.efub.mavve.auth.dto.response.KakaoUserInfoResponse;
+import com.efub.mavve.auth.dto.response.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
@@ -14,21 +13,22 @@ public class OauthClient {
     private final RestClient restClient;
     private final OauthProperties oauthProperties;
 
-    public KakaoUserInfoResponse requestOauthInfo(String code){
-        KakaoTokenResponse kakaoTokenResponse = requestToken(code);
-
+    public SpotifyUserInfoResponse requestOauthInfo(String code){
+        SpotifyTokenResponse spotifyTokenResponse = requestToken(code);
         String userInfoRequestUri = oauthProperties.getUserInfoUri();
         String headerName = "Authorization";
-        String headerValue = "Bearer " + kakaoTokenResponse.getAccess_token();
+        String headerValue = "Bearer " + spotifyTokenResponse.getAccess_token();
 
-        return restClient.get()
-                .uri(userInfoRequestUri)
-                .header(headerName, headerValue)
-                .retrieve()
-                .body(KakaoUserInfoResponse.class);
+        SpotifyUserInfoRaw spotifyUserInfoRaw =  restClient.get()
+                                                .uri(userInfoRequestUri)
+                                                .header(headerName, headerValue)
+                                                .retrieve()
+                                                .body(SpotifyUserInfoRaw.class);
+        return SpotifyUserInfoResponse.fromSpotifyTokenResponse(spotifyUserInfoRaw.getId(),
+                spotifyUserInfoRaw.getDisplay_name(), spotifyUserInfoRaw.getEmail(), spotifyUserInfoRaw.getCountry(), spotifyTokenResponse);
     }
 
-    private KakaoTokenResponse requestToken(String code){
+    private SpotifyTokenResponse requestToken(String code){
         String tokenRequestUri = oauthProperties.getTokenRequestUri();
         MultiValueMap<String, String> tokenRequestBody = oauthProperties.createTokenRequestBody(code);
 
@@ -37,6 +37,10 @@ public class OauthClient {
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .body(tokenRequestBody)
                 .retrieve()
-                .body(KakaoTokenResponse.class);
+                .body(SpotifyTokenResponse.class);
+    }
+
+    public String getRedirectUri(){
+        return oauthProperties.redirectToSpotify();
     }
 }
