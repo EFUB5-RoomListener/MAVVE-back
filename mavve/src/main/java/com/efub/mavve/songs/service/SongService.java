@@ -2,10 +2,9 @@ package com.efub.mavve.songs.service;
 
 import com.efub.mavve.auth.domain.User;
 import com.efub.mavve.auth.service.jwt.SpotifyTokenService;
-import com.efub.mavve.global.exception.ClientExceptionCode;
 import com.efub.mavve.global.exception.ExceptionCode;
 import com.efub.mavve.global.exception.MavveException;
-import com.efub.mavve.songs.dto.response.SearchSongResponse;
+import com.efub.mavve.songs.dto.response.spotify.SearchSongResponse;
 import com.efub.mavve.songs.dto.response.SongResponse;
 import com.efub.mavve.songs.dto.response.TotalSongsResponse;
 import com.efub.mavve.songs.repository.SongRepository;
