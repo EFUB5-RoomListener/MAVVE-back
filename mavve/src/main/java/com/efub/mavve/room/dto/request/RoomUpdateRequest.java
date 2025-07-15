@@ -6,9 +6,9 @@ import jakarta.validation.constraints.NotNull;
 
 import java.util.List;
 
-public record RoomUpdateRequest (@NotNull String roomName,
+public record RoomUpdateRequest (String roomName,
                                 List<String> tag,
-                                @NotNull boolean isPublic){
+                                boolean isPublic){
     public Room toEntity(User user){
         return Room.builder()
                 .user(user)

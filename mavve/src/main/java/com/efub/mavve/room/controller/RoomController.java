@@ -31,7 +31,7 @@ public class RoomController {
 
     // 방 수정
     @PatchMapping("/{roomId}")
-    public ResponseEntity<RoomResponse> updateRoom(@PathVariable("id") Long roomId,
+    public ResponseEntity<RoomResponse> updateRoom(@PathVariable("roomId") Long roomId,
                                                    @AuthenticationPrincipal User user,
                                                    @Valid @RequestBody RoomUpdateRequest request){
         RoomResponse response = roomService.updateRoom(roomId, request, user);
