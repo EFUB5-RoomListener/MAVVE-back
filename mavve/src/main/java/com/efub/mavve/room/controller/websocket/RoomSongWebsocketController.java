@@ -14,19 +14,19 @@ import org.springframework.stereotype.Controller;
 
 @Controller
 @RequiredArgsConstructor
-public class RoomWebsocketController {
+public class RoomSongWebsocketController {
     private final SimpMessageSendingOperations messagingTemplate;
     private final RoomSongWebsocketService roomSongWebsocketService;
 
     @MessageMapping("/rooms/{roomCode}/add-song")
     public void addSong(@DestinationVariable Long roomCode, @Payload AddSongRequestPayload request) {
         AddSongResponsePayload response = roomSongWebsocketService.addSong(roomCode, request);
-        messagingTemplate.convertAndSend("/topic/rooms/" + roomCode, response);
+        messagingTemplate.convertAndSend("/topic/rooms/" + roomCode + "/songs", response);
     }
 
     @MessageMapping("/rooms/{roomCode}/delete-song")
     public void deleteSongs(@DestinationVariable Long roomCode, @Payload DeleteSongRequestPayload request){
         DeleteSongResponsePayload response = roomSongWebsocketService.deleteSongs(roomCode, request);
-        messagingTemplate.convertAndSend("/topic/rooms/" + roomCode, response);
+        messagingTemplate.convertAndSend("/topic/rooms/" + roomCode + "/songs", response);
     }
 }
