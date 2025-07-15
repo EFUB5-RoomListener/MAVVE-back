@@ -35,7 +35,7 @@ public class PlaylistService {
         String playImageUrl = request.playImageUrl();
 
         // 플레이리스트 이름 중복 검사
-        if (!playlistRepository.existsByName(name)) {
+        if (playlistRepository.existsByName(name)) {
             throw new MavveException(ExceptionCode.TITLE_ALREADY_EXIST);
         }
 
