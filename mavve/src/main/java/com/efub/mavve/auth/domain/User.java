@@ -38,4 +38,9 @@ public class User {
                 .spotifyUserId(spotifyUserId)
                 .build();
     }
+
+    public void updateProfile(String username, String profileImageUrl){
+        this.username = username;
+        this.userImageUrl = profileImageUrl;
+    }
 }
