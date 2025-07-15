@@ -1,4 +1,4 @@
-package com.efub.mavve.room.dto.summary;
+package com.efub.mavve.room.payload.summary;
 
 import lombok.*;
 

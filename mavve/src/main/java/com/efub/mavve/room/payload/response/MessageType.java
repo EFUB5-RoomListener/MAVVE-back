@@ -1,4 +1,4 @@
-package com.efub.mavve.room.dto.response;
+package com.efub.mavve.room.payload.response;
 
 public enum MessageType {
     ADD_SONG,
