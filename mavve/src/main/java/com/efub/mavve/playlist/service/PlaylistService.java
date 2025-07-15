@@ -35,7 +35,7 @@ public class PlaylistService {
         String playImageUrl = request.playImageUrl();
 
         // 플레이리스트 이름 중복 검사
-        if (!playlistRepository.existsByName(name)) {
+        if (playlistRepository.existsByName(name)) {
             throw new MavveException(ExceptionCode.TITLE_ALREADY_EXIST);
         }
 
@@ -87,7 +87,7 @@ public class PlaylistService {
 
     // 로그인한 사용자와 플레이리스트 소유자가 같은지 확인
     private void validatePlaylistOwner(Playlist playlist, User user) {
-        if (!playlist.getUser().getUserId().equals(user.getUserId())) {
+        if (playlist.getUser().getUserId().equals(user.getUserId())) {
             throw new MavveException(ExceptionCode.AUTH_TOKEN_MISMATCH);
         }
     }
