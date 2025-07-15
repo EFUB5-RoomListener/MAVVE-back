@@ -50,4 +50,9 @@ public class Playlist {
         song.getPlaylistSongs().add(playlistSong);
     }
 
+    public void removeSong(Song song, PlaylistSong playlistSong){
+        this.playlistSongs.remove(playlistSong);
+        song.getPlaylistSongs().remove(playlistSong);
+    }
+
 }

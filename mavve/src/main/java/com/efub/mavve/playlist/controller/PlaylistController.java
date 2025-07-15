@@ -78,4 +78,13 @@ public class PlaylistController {
         return ResponseEntity.ok(playlistService.addSongInPlaylist(user, playlistId, addSongRequest));
     }
 
+    // 플레이리스트에 노래 삭제
+    @DeleteMapping("/{playlistId}/songs/{songId}")
+    public ResponseEntity<Void> deleteSongInPlaylist(@AuthenticationPrincipal User user,
+                                                 @PathVariable("playlistId") Long playlistId,
+                                                 @PathVariable("songId") Long songId){
+        playlistService.deleteSongInPlaylist(user, playlistId, songId);
+        return ResponseEntity.noContent().build();
+    }
+
 }
