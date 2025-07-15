@@ -1,5 +1,6 @@
 package com.efub.mavve.global.S3Image.controller;
 
+import com.efub.mavve.global.S3Image.dto.request.ImageDeleteRequest;
 import com.efub.mavve.global.S3Image.dto.response.ImageUrlResponse;
 import com.efub.mavve.global.S3Image.service.S3ImageService;
 import lombok.RequiredArgsConstructor;
@@ -24,9 +25,9 @@ public class S3ImageController {
         return ResponseEntity.ok(new ImageUrlResponse(imageUrl));
     }
 
-    @DeleteMapping("/delete")
-    public ResponseEntity<Void> deleteImage(@RequestParam("fileUrl") String fileUrl) {
-        s3ImageService.deleteFile(fileUrl);
+    @PostMapping("/delete")
+    public ResponseEntity<Void> deleteImage(@RequestBody ImageDeleteRequest request) {
+        s3ImageService.deleteFile(request.getFileUrl());
         return ResponseEntity.noContent().build();
     }
 }
