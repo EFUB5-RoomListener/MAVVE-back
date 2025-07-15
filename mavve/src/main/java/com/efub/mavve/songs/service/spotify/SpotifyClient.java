@@ -1,5 +1,7 @@
 package com.efub.mavve.songs.service.spotify;
 
+import com.efub.mavve.global.exception.ExceptionCode;
+import com.efub.mavve.global.exception.MavveException;
 import com.efub.mavve.songs.dto.response.spotify.SearchSongResponse;
 import com.efub.mavve.songs.dto.response.spotify.SongInfoResponse;
 import lombok.RequiredArgsConstructor;
@@ -22,16 +24,22 @@ public class SpotifyClient {
                 .uri(searchRequestUri)
                 .header(headerName, headerValue + accessToken)
                 .retrieve()
+                // TODO: spotify reissue 로직 추가
                 .body(SearchSongResponse.class);
     }
 
     public SongInfoResponse getSongInfo(String spotifySongId, String accessToken){
         String songInfoRequestUri = spotifyProperties.getSongInfoRequestUri(spotifySongId);
-        return restClient.get()
+        SongInfoResponse songInfoResponse = restClient.get()
                 .uri(songInfoRequestUri)
                 .header(headerName, headerValue + accessToken)
                 .retrieve()
+                // TODO: spotify reissue 로직 추가
                 .body(SongInfoResponse.class);
+        if(songInfoResponse.getName() == null){
+            throw new MavveException(ExceptionCode.SONG_RESULT_NOT_FOUND);
+        }
+        return songInfoResponse;
     }
 
 

@@ -92,14 +92,9 @@ public class PlaylistService {
         validatePlaylistOwner(playlist, user);
         String spotifySongId = addSongRequest.getSpotifySongId();
         // db에 이미 있는 노래인지 확인
-        Song newSong = null;
-        if(songShareService.existSongBySpotifySongId(spotifySongId)){
-            newSong = songShareService.getSongBySpotifySongId(spotifySongId);
-        }
-        else{
-            // spotify에서 id로 노래 정보 가져오고 노래를 db에 저장
-            newSong = songShareService.saveSongBySpotifySongId(spotifySongId, user);
-        }
+        Song newSong = songShareService.existSongBySpotifySongId(spotifySongId)
+                ? songShareService.getSongBySpotifySongId(spotifySongId)
+                : songShareService.saveSongBySpotifySongId(spotifySongId, user);
         // 저장된 노래를 playlist에 추가
         playlist.addSong(newSong);
         // 해당 노래에 대한 정보를 return
