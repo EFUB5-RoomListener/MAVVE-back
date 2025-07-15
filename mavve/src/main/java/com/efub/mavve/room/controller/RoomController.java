@@ -1,0 +1,71 @@
+package com.efub.mavve.room.controller;
+
+import com.efub.mavve.auth.domain.User;
+import com.efub.mavve.room.dto.request.RoomCreateRequest;
+import com.efub.mavve.room.dto.request.RoomUpdateRequest;
+import com.efub.mavve.room.dto.response.RoomListResponse;
+import com.efub.mavve.room.dto.response.RoomResponse;
+import com.efub.mavve.room.service.RoomService;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.*;
+
+import java.net.URI;
+
+@RestController
+@RequiredArgsConstructor
+@RequestMapping("/rooms")
+public class RoomController {
+    private final RoomService roomService;
+
+    // 방 생성
+    @PostMapping
+    public ResponseEntity<RoomResponse> createRoom(@AuthenticationPrincipal User user,
+                                                   @Valid @RequestBody RoomCreateRequest request){
+        RoomResponse response = roomService.createRoom(request, user);
+        Long roomId = response.getRoomId();
+        return ResponseEntity.created(URI.create("/rooms/"+roomId)).body(response);
+    }
+
+    // 방 수정
+    @PatchMapping("/{roomId}")
+    public ResponseEntity<RoomResponse> updateRoom(@PathVariable("id") Long roomId,
+                                                   @AuthenticationPrincipal User user,
+                                                   @Valid @RequestBody RoomUpdateRequest request){
+        RoomResponse response = roomService.updateRoom(roomId, request, user);
+        return ResponseEntity.ok(response);
+    }
+
+    // 방 삭제
+    @DeleteMapping("/{roomId}")
+    public ResponseEntity<Void> deleteRoom(@AuthenticationPrincipal User user,
+                                           @PathVariable("roomId") Long roomId){
+        roomService.deleteRoom(roomId, user);
+        return ResponseEntity.noContent().build();
+    }
+
+    // 방 리스트 조회
+    @GetMapping
+    public ResponseEntity<RoomListResponse> getListRoom(){
+        RoomListResponse response = roomService.getListRoom();
+        return ResponseEntity.ok(response);
+    }
+
+    // 내가 만든 방 리스트 조회
+    @GetMapping("/users")
+    public ResponseEntity<RoomListResponse> getUserListRoom(@AuthenticationPrincipal User user){
+        RoomListResponse response = roomService.getUserListRoom(user);
+        return ResponseEntity.ok(response);
+    }
+
+
+    // 조회순 방 리스트 5개 조회
+    @GetMapping("/hot")
+    public ResponseEntity<RoomListResponse> getHotListRoom(){
+        RoomListResponse response = roomService.getHotListRoom();
+        return ResponseEntity.ok(response);
+    }
+
+}
