@@ -1,11 +1,11 @@
-package com.efub.mavve.room.service;
+package com.efub.mavve.room.service.websocket;
 
-import com.efub.mavve.room.dto.request.AddSongRequest;
-import com.efub.mavve.room.dto.request.DeleteSongRequest;
-import com.efub.mavve.room.dto.response.AddSongResponse;
-import com.efub.mavve.room.dto.response.DeleteSongResponse;
-import com.efub.mavve.room.dto.response.NextSongResponse;
-import com.efub.mavve.room.dto.summary.SongSummary;
+import com.efub.mavve.room.payload.request.AddSongRequestPayload;
+import com.efub.mavve.room.payload.request.DeleteSongRequestPayload;
+import com.efub.mavve.room.payload.response.AddSongResponsePayload;
+import com.efub.mavve.room.payload.response.DeleteSongResponsePayload;
+import com.efub.mavve.room.payload.response.NextSongResponsePayload;
+import com.efub.mavve.room.payload.summary.SongSummary;
 import com.efub.mavve.room.service.redis.RoomSongRedisService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
@@ -18,20 +18,20 @@ import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
-public class RoomWebsocketService {
+public class RoomSongWebsocketService {
     private final RoomSongRedisService songRedisService;
     private final SimpMessageSendingOperations messagingTemplate;
     private final ThreadPoolTaskScheduler taskScheduler;
 
-    public AddSongResponse addSong(Long roomCode, AddSongRequest request) {
+    public AddSongResponsePayload addSong(Long roomCode, AddSongRequestPayload request) {
         //TODO: 노래검색 함수 생성 후 검색한 노래로 수정
         songRedisService.addSong(roomCode, request.getSong());
-        return AddSongResponse.from(request.getSong());
+        return AddSongResponsePayload.from(request.getSong());
     }
 
-    public DeleteSongResponse deleteSongs(Long roomCode, DeleteSongRequest request) {
+    public DeleteSongResponsePayload deleteSongs(Long roomCode, DeleteSongRequestPayload request) {
         songRedisService.deleteSongs(roomCode, request.getSongIds());
-        return DeleteSongResponse.from(request.getSongIds());
+        return DeleteSongResponsePayload.from(request.getSongIds());
     }
 
     // 다음 노래 예약 스케쥴링
@@ -48,6 +48,6 @@ public class RoomWebsocketService {
     // 다음 노래 전환 브로드캐스트
     private void broadcastNextSong(Long roomCode, SongSummary nextSong, LocalDateTime startTime){
         songRedisService.addCurrentSong(roomCode, nextSong, startTime);
-        messagingTemplate.convertAndSend("/topic/room/" + roomCode, NextSongResponse.from(nextSong));
+        messagingTemplate.convertAndSend("/topic/room/" + roomCode, NextSongResponsePayload.from(nextSong));
     }
 }

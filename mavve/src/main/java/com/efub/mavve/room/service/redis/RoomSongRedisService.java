@@ -2,7 +2,7 @@ package com.efub.mavve.room.service.redis;
 
 import com.efub.mavve.global.exception.ExceptionCode;
 import com.efub.mavve.global.exception.MavveException;
-import com.efub.mavve.room.dto.summary.SongSummary;
+import com.efub.mavve.room.payload.summary.SongSummary;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
