@@ -42,7 +42,10 @@ public enum ExceptionCode {
     //redis
     REDIS_SAVE_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, ClientExceptionCode.REDIS_SAVE_ERROR, "노래 저장 중 예상치 못한 에러가 발생했습니다."),
     REDIS_DELETE_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, ClientExceptionCode.REDIS_DELETE_ERROR, "노래 삭제 중 예상치 못한 에러가 발생했습니다."),
-    REDIS_DESERIALIZATION_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, ClientExceptionCode.REDIS_DESERIALIZATION_ERROR, "Redis값 역직렬화에 실패했습니다.");
+    REDIS_DESERIALIZATION_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, ClientExceptionCode.REDIS_DESERIALIZATION_ERROR, "Redis값 역직렬화에 실패했습니다."),
+
+    //방
+    ROOM_OWNER_MISMATCH(HttpStatus.UNAUTHORIZED, ClientExceptionCode.ROOM_OWNER_MISMATCH, "방에 대한 권한이 없습니다.");
 
     private final HttpStatus httpStatus;
     private final ClientExceptionCode clientExceptionCode;
