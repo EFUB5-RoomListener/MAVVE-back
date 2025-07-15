@@ -87,7 +87,7 @@ public class PlaylistService {
 
     // 로그인한 사용자와 플레이리스트 소유자가 같은지 확인
     private void validatePlaylistOwner(Playlist playlist, User user) {
-        if (playlist.getUser().getUserId().equals(user.getUserId())) {
+        if (!playlist.getUser().getUserId().equals(user.getUserId())) {
             throw new MavveException(ExceptionCode.AUTH_TOKEN_MISMATCH);
         }
     }
