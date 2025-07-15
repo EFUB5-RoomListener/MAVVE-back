@@ -1,6 +1,9 @@
 package com.efub.mavve.songs.service.spotify;
 
-import com.efub.mavve.songs.dto.response.SearchSongResponse;
+import com.efub.mavve.global.exception.ExceptionCode;
+import com.efub.mavve.global.exception.MavveException;
+import com.efub.mavve.songs.dto.response.spotify.SearchSongResponse;
+import com.efub.mavve.songs.dto.response.spotify.SongInfoResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -12,16 +15,32 @@ import org.springframework.web.client.RestClient;
 public class SpotifyClient {
     private final RestClient restClient;
     private final SpotifyProperties spotifyProperties;
+    private final String headerName = "Authorization";
+    private final String headerValue = "Bearer ";
 
     public SearchSongResponse getSongSearchResult(String query, String accessToken, int limit, int offset) {
-        String headerName = "Authorization";
-        String headerValue = "Bearer " +  accessToken;
-
         String searchRequestUri = spotifyProperties.getSerchSongRequestUri(query, limit, offset);
         return restClient.get()
                 .uri(searchRequestUri)
-                .header(headerName, headerValue)
+                .header(headerName, headerValue + accessToken)
                 .retrieve()
+                // TODO: spotify reissue 로직 추가
                 .body(SearchSongResponse.class);
     }
+
+    public SongInfoResponse getSongInfo(String spotifySongId, String accessToken){
+        String songInfoRequestUri = spotifyProperties.getSongInfoRequestUri(spotifySongId);
+        SongInfoResponse songInfoResponse = restClient.get()
+                .uri(songInfoRequestUri)
+                .header(headerName, headerValue + accessToken)
+                .retrieve()
+                // TODO: spotify reissue 로직 추가
+                .body(SongInfoResponse.class);
+        if(songInfoResponse.getName() == null){
+            throw new MavveException(ExceptionCode.SONG_RESULT_NOT_FOUND);
+        }
+        return songInfoResponse;
+    }
+
+
 }

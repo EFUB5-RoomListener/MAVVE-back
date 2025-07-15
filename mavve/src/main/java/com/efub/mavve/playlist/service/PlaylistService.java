@@ -1,31 +1,31 @@
 package com.efub.mavve.playlist.service;
 
 import com.efub.mavve.auth.domain.User;
-import com.efub.mavve.auth.repository.UserRepository;
-import com.efub.mavve.auth.service.AuthService;
 import com.efub.mavve.global.exception.ExceptionCode;
 import com.efub.mavve.global.exception.MavveException;
 import com.efub.mavve.playlist.domain.Playlist;
+import com.efub.mavve.playlist.dto.request.AddSongRequest;
 import com.efub.mavve.playlist.dto.request.PlaylistCreateRequest;
 import com.efub.mavve.playlist.dto.request.PlaylistUpdateRequest;
 import com.efub.mavve.playlist.dto.response.PlaylistListResponse;
 import com.efub.mavve.playlist.dto.response.PlaylistResponse;
 import com.efub.mavve.playlist.dto.summary.PlaylistSummary;
 import com.efub.mavve.playlist.repository.PlaylistRepository;
+import com.efub.mavve.songs.domain.Song;
+import com.efub.mavve.songs.dto.response.SongResponse;
+import com.efub.mavve.songs.service.SongShareService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import com.efub.mavve.global.exception.ExceptionCode;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class PlaylistService {
 
     private final PlaylistRepository playlistRepository;
-    private final UserRepository userRepository;
+    private final SongShareService songShareService;
 
     // 플레이리스트 생성
     @Transactional
@@ -83,6 +83,22 @@ public class PlaylistService {
         Playlist playlist = getPlaylistOrThrow(playlistId);
         validatePlaylistOwner(playlist, user);
         playlistRepository.delete(playlist);
+    }
+
+    //플레이리스트에 노래 추가
+    @Transactional
+    public SongResponse addSongInPlaylist(User user, Long playlistId, AddSongRequest addSongRequest){
+        Playlist playlist = getPlaylistOrThrow(playlistId);
+        validatePlaylistOwner(playlist, user);
+        String spotifySongId = addSongRequest.getSpotifySongId();
+        // db에 이미 있는 노래인지 확인
+        Song newSong = songShareService.existSongBySpotifySongId(spotifySongId)
+                ? songShareService.getSongBySpotifySongId(spotifySongId)
+                : songShareService.saveSongBySpotifySongId(spotifySongId, user);
+        // 저장된 노래를 playlist에 추가
+        playlist.addSong(newSong);
+        // 해당 노래에 대한 정보를 return
+        return SongResponse.fromSongEntity(newSong);
     }
 
     // 로그인한 사용자와 플레이리스트 소유자가 같은지 확인
