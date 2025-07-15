@@ -4,13 +4,16 @@ import com.efub.mavve.auth.domain.User;
 import com.efub.mavve.auth.service.jwt.CustomUserDetails;
 import com.efub.mavve.auth.service.jwt.JwtAuthenticationFilter;
 import com.efub.mavve.playlist.domain.Playlist;
+import com.efub.mavve.playlist.dto.request.AddSongRequest;
 import com.efub.mavve.playlist.dto.request.PlaylistCreateRequest;
 import com.efub.mavve.playlist.dto.request.PlaylistUpdateRequest;
 import com.efub.mavve.playlist.dto.response.PlaylistListResponse;
 import com.efub.mavve.playlist.dto.response.PlaylistResponse;
 import com.efub.mavve.playlist.service.PlaylistService;
+import com.efub.mavve.songs.dto.response.SongResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -65,6 +68,14 @@ public class PlaylistController {
 
         playlistService.deletePlaylist(playlistId, user);
         return ResponseEntity.ok(Map.of("message", "성공적으로 삭제되었습니다."));
+    }
+
+    // 플레이리스트에 노래 추가
+    @PostMapping("/{playlistId}/songs")
+    public ResponseEntity<SongResponse> addSongInPlaylist(@AuthenticationPrincipal User user,
+                                                          @PathVariable("playlistId") Long playlistId,
+                                                          @Valid @RequestBody AddSongRequest addSongRequest){
+        return ResponseEntity.ok(playlistService.addSongInPlaylist(user, playlistId, addSongRequest));
     }
 
 }
