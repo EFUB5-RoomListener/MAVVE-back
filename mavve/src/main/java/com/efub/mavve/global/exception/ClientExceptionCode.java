@@ -12,6 +12,7 @@ public enum ClientExceptionCode {
     USER_NOT_FOUND,
     ILLEGAL_ARGUMENT,
     INTERNAL_SERVER_ERROR,
+    ALREADY_LOGGED_TOKEN,
 
     ROOM_NOT_FOUND,
     SONG_NOT_FOUND,
