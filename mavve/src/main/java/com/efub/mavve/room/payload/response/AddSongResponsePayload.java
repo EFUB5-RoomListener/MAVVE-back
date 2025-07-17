@@ -1,6 +1,6 @@
-package com.efub.mavve.room.dto.response;
+package com.efub.mavve.room.payload.response;
 
-import com.efub.mavve.room.dto.summary.SongSummary;
+import com.efub.mavve.room.payload.summary.SongSummary;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,12 +9,12 @@ import lombok.Getter;
 @Getter
 @Builder
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-public class AddSongResponse {
+public class AddSongResponsePayload {
     MessageType type;
     SongSummary song;
 
-    public static AddSongResponse from(SongSummary song) {
-        return AddSongResponse.builder()
+    public static AddSongResponsePayload from(SongSummary song) {
+        return AddSongResponsePayload.builder()
                 .type(MessageType.ADD_SONG)
                 .song(song)
                 .build();
