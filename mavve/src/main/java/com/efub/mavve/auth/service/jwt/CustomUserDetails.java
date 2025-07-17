@@ -6,12 +6,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+
+import java.security.Principal;
 import java.util.List;
 import java.util.Collection;
 
 @Getter
 @RequiredArgsConstructor
-public class CustomUserDetails implements UserDetails {
+public class CustomUserDetails implements UserDetails, Principal {
 
     private final User user;
 
@@ -54,4 +56,8 @@ public class CustomUserDetails implements UserDetails {
         return true;
     }
 
+    @Override
+    public String getName() {
+        return user.getUserId().toString();
+    }
 }
