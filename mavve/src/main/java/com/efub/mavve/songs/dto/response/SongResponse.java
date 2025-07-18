@@ -1,6 +1,8 @@
 package com.efub.mavve.songs.dto.response;
 
 import com.efub.mavve.songs.domain.Song;
+import com.efub.mavve.songs.domain.SongArtist;
+import com.efub.mavve.songs.dto.response.spotify.SearchSongResponse;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Builder;
 import lombok.Getter;
@@ -8,7 +10,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Getter
@@ -16,7 +17,7 @@ import java.util.stream.Collectors;
 @Builder
 public class SongResponse {
     @NotBlank(message = "노래 id가 누락되었습니다.")
-    private final String songId;
+    private final String spotifySongId;
     @NotBlank(message = "노래 제목이 누락되었습니다.")
     private final String title;
     @NotBlank(message = "가수가 누락되었습니다.")
@@ -31,7 +32,7 @@ public class SongResponse {
     public static List<SongResponse> fromSpotifyResponse(SearchSongResponse searchSongResponse) {
         return searchSongResponse.getTracks().getItems().stream()
                 .map(trackItem -> SongResponse.builder()
-                        .songId(trackItem.getId())
+                        .spotifySongId(trackItem.getId())
                         .title(trackItem.getName())
                         .artist(trackItem.getArtists().stream().map(SearchSongResponse.Artist::getName).toList())
                         .album(trackItem.getAlbum().getName())
@@ -40,6 +41,7 @@ public class SongResponse {
                         .build()).toList();
     }
 
+<<<<<<< HEAD
     // 사용자가 플레이리스트를 조회할 때
     public static SongResponse from(Song song) {
         return SongResponse.builder()
@@ -53,4 +55,16 @@ public class SongResponse {
     }
 
 
+=======
+    public static SongResponse fromSongEntity(Song song) {
+        return SongResponse.builder()
+                .spotifySongId(song.getSpotifySongId())
+                .album(song.getAlbum())
+                .title(song.getTitle())
+                .duration(song.getDuration())
+                .coverUrl(song.getCoverImageUrl())
+                .artist(song.getSongArtists().stream().map(songArtist -> songArtist.getArtist().getArtistName()).toList())
+                .build();
+    }
+>>>>>>> develop
 }

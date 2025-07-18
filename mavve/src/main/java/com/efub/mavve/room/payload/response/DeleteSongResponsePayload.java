@@ -1,6 +1,5 @@
-package com.efub.mavve.room.dto.response;
+package com.efub.mavve.room.payload.response;
 
-import com.efub.mavve.room.dto.summary.SongSummary;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,12 +10,12 @@ import java.util.List;
 @Getter
 @Builder
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-public class DeleteSongResponse {
+public class DeleteSongResponsePayload {
     MessageType type;
     List<String> songIds;
 
-    public static DeleteSongResponse from(List<String> songIds) {
-        return DeleteSongResponse.builder()
+    public static DeleteSongResponsePayload from(List<String> songIds) {
+        return DeleteSongResponsePayload.builder()
                 .type(MessageType.DELETE_SONG)
                 .songIds(songIds)
                 .build();

@@ -1,4 +1,4 @@
-package com.efub.mavve.songs.dto.response;
+package com.efub.mavve.songs.dto.response.spotify;
 
 import lombok.Builder;
 import lombok.Getter;

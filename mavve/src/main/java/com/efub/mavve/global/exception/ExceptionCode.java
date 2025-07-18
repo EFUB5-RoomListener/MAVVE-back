@@ -28,6 +28,9 @@ public enum ExceptionCode {
     SONG_LIST_EMPTY(HttpStatus.NO_CONTENT, ClientExceptionCode.SONG_LIST_EMPTY, "해당 방의 노래리스트가 비어있습니다."),
     ILLEGAL_PAGE_NUMBER(HttpStatus.BAD_REQUEST, ClientExceptionCode.ILLEGAL_PAGE_NUMBER, "잘못된 페이지 넘버입니다."),
     ILLEGAL_PAGE_SIZE(HttpStatus.BAD_REQUEST, ClientExceptionCode.ILLEGAL_PAGE_SIZE, "잘못된 페이지 사이즈입니다."),
+    SONG_RESULT_NOT_FOUND(HttpStatus.NOT_FOUND, ClientExceptionCode.SONG_RESULT_NOT_FOUND, "스포티파이에서 해당 노래에 대한 검색결과가 존재하지 않습니다."),
+
+    //플레이리스트
     PLAYLIST_NOT_FOUND(HttpStatus.NOT_FOUND, ClientExceptionCode.PLAYLIST_NOT_FOUND, "해당되는 플레이리스트가 존재하지 않습니다."),
     TITLE_ALREADY_EXIST(HttpStatus.CONFLICT, ClientExceptionCode.TITLE_ALREADY_EXIST, "이미 존재하는 이름의 플레이리스트입니다."),
 
@@ -39,7 +42,10 @@ public enum ExceptionCode {
     //redis
     REDIS_SAVE_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, ClientExceptionCode.REDIS_SAVE_ERROR, "노래 저장 중 예상치 못한 에러가 발생했습니다."),
     REDIS_DELETE_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, ClientExceptionCode.REDIS_DELETE_ERROR, "노래 삭제 중 예상치 못한 에러가 발생했습니다."),
-    REDIS_DESERIALIZATION_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, ClientExceptionCode.REDIS_DESERIALIZATION_ERROR, "Redis값 역직렬화에 실패했습니다.");
+    REDIS_DESERIALIZATION_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, ClientExceptionCode.REDIS_DESERIALIZATION_ERROR, "Redis값 역직렬화에 실패했습니다."),
+
+    //방
+    ROOM_OWNER_MISMATCH(HttpStatus.UNAUTHORIZED, ClientExceptionCode.ROOM_OWNER_MISMATCH, "방에 대한 권한이 없습니다.");
 
     private final HttpStatus httpStatus;
     private final ClientExceptionCode clientExceptionCode;

@@ -1,6 +1,7 @@
 package com.efub.mavve.playlist.domain;
 
 import com.efub.mavve.auth.domain.User;
+import com.efub.mavve.songs.domain.Song;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -9,6 +10,9 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,6 +34,7 @@ public class Playlist {
 
     private String playImageUrl;
 
+<<<<<<< HEAD
     @OneToMany(mappedBy = "playlist", cascade = CascadeType.ALL)
     private List<PlaylistSong> playlistSongs = new ArrayList<>();
 
@@ -37,6 +42,11 @@ public class Playlist {
     @Column(updatable = false)
     private LocalDateTime createdAt;
 
+=======
+    @OneToMany(mappedBy = "playlist", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<PlaylistSong> playlistSongs = new ArrayList<>();
+
+>>>>>>> develop
     @Builder
     public Playlist(User user, String name, String playImageUrl) {
         this.user = user;
@@ -47,6 +57,12 @@ public class Playlist {
     public void changePlaylist(String newName, String newPlayImageUrl){
         this.name = newName;
         this.playImageUrl = newPlayImageUrl;
+    }
+
+    public void addSong(Song song){
+        PlaylistSong playlistSong = PlaylistSong.create(this, song);
+        this.playlistSongs.add(playlistSong);
+        song.getPlaylistSongs().add(playlistSong);
     }
 
 }

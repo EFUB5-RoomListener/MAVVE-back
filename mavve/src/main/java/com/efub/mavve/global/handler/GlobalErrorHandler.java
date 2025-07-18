@@ -4,6 +4,7 @@ import com.efub.mavve.global.exception.ExceptionCode;
 import com.efub.mavve.global.exception.MavveException;
 import com.efub.mavve.global.exception.dto.ExceptionResponse;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.time.ZonedDateTime;
 
+@Slf4j
 @RestControllerAdvice
 public class GlobalErrorHandler {
 
