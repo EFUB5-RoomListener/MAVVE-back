@@ -19,6 +19,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
+
+import static com.efub.mavve.songs.service.spotify.SearchType.playlist;
 
 @Service
 @RequiredArgsConstructor
@@ -85,9 +88,19 @@ public class PlaylistService {
         playlistRepository.delete(playlist);
     }
 
+    // 플레이리스트 검색
+    @Transactional(readOnly = true)
+    public List<PlaylistSummary> searchPlaylists(String keyword, User user) {
+        List<Playlist> playlists = playlistRepository.findByUserAndNameContainingIgnoreCaseOrderByCreatedAtDesc(user, keyword);
+
+        return playlists.stream()
+                .map(PlaylistSummary::from)
+                .collect(Collectors.toList());
+    }
+
     //플레이리스트에 노래 추가
     @Transactional
-    public SongResponse addSongInPlaylist(User user, Long playlistId, AddSongRequest addSongRequest){
+    public SongResponse addSongInPlaylist(User user, Long  playlistId, AddSongRequest addSongRequest){
         Playlist playlist = getPlaylistOrThrow(playlistId);
         validatePlaylistOwner(playlist, user);
         String spotifySongId = addSongRequest.getSpotifySongId();
@@ -113,6 +126,5 @@ public class PlaylistService {
         return playlistRepository.findById(playlistId)
                 .orElseThrow(() -> new MavveException(ExceptionCode.PLAYLIST_NOT_FOUND));
     }
-
 
 }
