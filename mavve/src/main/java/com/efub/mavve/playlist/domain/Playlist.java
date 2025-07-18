@@ -34,7 +34,6 @@ public class Playlist {
 
     private String playImageUrl;
 
-<<<<<<< HEAD
     @OneToMany(mappedBy = "playlist", cascade = CascadeType.ALL)
     private List<PlaylistSong> playlistSongs = new ArrayList<>();
 
@@ -42,11 +41,6 @@ public class Playlist {
     @Column(updatable = false)
     private LocalDateTime createdAt;
 
-=======
-    @OneToMany(mappedBy = "playlist", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<PlaylistSong> playlistSongs = new ArrayList<>();
-
->>>>>>> develop
     @Builder
     public Playlist(User user, String name, String playImageUrl) {
         this.user = user;

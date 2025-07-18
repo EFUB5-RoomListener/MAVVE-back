@@ -41,21 +41,6 @@ public class SongResponse {
                         .build()).toList();
     }
 
-<<<<<<< HEAD
-    // 사용자가 플레이리스트를 조회할 때
-    public static SongResponse from(Song song) {
-        return SongResponse.builder()
-                .songId(String.valueOf(song.getSongId()))
-                .title(song.getTitle())
-                .artist(List.of(song.getArtist()))
-                .album(song.getAlbum())
-                .coverUrl(song.getCoverImageUrl())
-                .duration(song.getDuration())
-                .build();
-    }
-
-
-=======
     public static SongResponse fromSongEntity(Song song) {
         return SongResponse.builder()
                 .spotifySongId(song.getSpotifySongId())
@@ -66,5 +51,4 @@ public class SongResponse {
                 .artist(song.getSongArtists().stream().map(songArtist -> songArtist.getArtist().getArtistName()).toList())
                 .build();
     }
->>>>>>> develop
 }
