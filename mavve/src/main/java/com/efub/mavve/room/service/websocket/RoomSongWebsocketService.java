@@ -1,5 +1,6 @@
 package com.efub.mavve.room.service.websocket;
 
+import com.efub.mavve.auth.domain.User;
 import com.efub.mavve.room.payload.request.AddSongRequestPayload;
 import com.efub.mavve.room.payload.request.DeleteSongRequestPayload;
 import com.efub.mavve.room.payload.response.AddSongResponsePayload;
@@ -7,11 +8,13 @@ import com.efub.mavve.room.payload.response.DeleteSongResponsePayload;
 import com.efub.mavve.room.payload.response.NextSongResponsePayload;
 import com.efub.mavve.room.payload.summary.SongSummary;
 import com.efub.mavve.room.service.redis.RoomSongRedisService;
+import com.efub.mavve.room.service.redis.RoomUserRedisService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.stereotype.Service;
 
+import java.security.Principal;
 import java.time.Instant;
 import java.time.LocalDateTime;
 
@@ -20,6 +23,8 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 public class RoomSongWebsocketService {
     private final RoomSongRedisService songRedisService;
+    private final RoomUserRedisService roomUserRedisService;
+    private final PrincipalUtil principalUtil;
     private final SimpMessageSendingOperations messagingTemplate;
     private final ThreadPoolTaskScheduler taskScheduler;
 
@@ -49,5 +54,12 @@ public class RoomSongWebsocketService {
     private void broadcastNextSong(Long roomCode, SongSummary nextSong, LocalDateTime startTime){
         songRedisService.addCurrentSong(roomCode, nextSong, startTime);
         messagingTemplate.convertAndSend("/topic/room/" + roomCode, NextSongResponsePayload.from(nextSong));
+    }
+
+    // 노래 정보 받을 주소 구독 -> 사용자 정보 저장
+    public User subscribe(Long roomCode, Principal principal) {
+        User user = principalUtil.principalToUser(principal);
+        roomUserRedisService.addUser(roomCode, user);
+        return user;
     }
 }
