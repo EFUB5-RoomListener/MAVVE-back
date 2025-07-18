@@ -85,6 +85,16 @@ public class PlaylistService {
         playlistRepository.delete(playlist);
     }
 
+    // 플레이리스트 검색
+    @Transactional(readOnly = true)
+    public List<PlaylistSummary> searchPlaylists(String keyword, User user) {
+        List<Playlist> playlists = playlistRepository.findByUserAndNameContainingIgnoreCaseOrderByCreatedAtDesc(user, keyword);
+
+        return playlists.stream()
+                .map(PlaylistSummary::from)
+                .collect(Collectors.toList());
+    }
+
     // 로그인한 사용자와 플레이리스트 소유자가 같은지 확인
     private void validatePlaylistOwner(Playlist playlist, User user) {
         if (!playlist.getUser().getUserId().equals(user.getUserId())) {
