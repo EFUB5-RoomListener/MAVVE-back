@@ -31,9 +31,9 @@ public class RoomUserRedisService {
     // 현재 방에 남아있는 사용자가 있는지 확인
     public boolean hasUsers(Long roomCode){
         String key = RoomRedisKeyUtils.getUserListKey(roomCode);
-        List<String> userList = stringRedisTemplate.opsForList().range(key, 0, -1);
+        Long userCount = stringRedisTemplate.opsForList().size(key);
 
-        return userList != null && !userList.isEmpty();
+        return !(userCount == 0 || userCount == null);
     }
 
     // 현재 방에 남이있는 사용자 전체 조회

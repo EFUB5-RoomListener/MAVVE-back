@@ -3,6 +3,7 @@ package com.efub.mavve.room.controller;
 import com.efub.mavve.auth.domain.User;
 import com.efub.mavve.room.dto.request.RoomCreateRequest;
 import com.efub.mavve.room.dto.request.RoomUpdateRequest;
+import com.efub.mavve.room.dto.response.RoomEnterResponse;
 import com.efub.mavve.room.dto.response.RoomListResponse;
 import com.efub.mavve.room.dto.response.RoomResponse;
 import com.efub.mavve.room.service.RoomService;
@@ -65,6 +66,13 @@ public class RoomController {
     @GetMapping("/hot")
     public ResponseEntity<RoomListResponse> getHotListRoom(){
         RoomListResponse response = roomService.getHotListRoom();
+        return ResponseEntity.ok(response);
+    }
+
+    // 방 입장
+    @GetMapping("/{roomId}/enter")
+    public ResponseEntity<RoomEnterResponse> getRoomEnterInfo(@PathVariable("roomId") Long roomId){
+        RoomEnterResponse response = roomService.getRoomEnterInfo(roomId);
         return ResponseEntity.ok(response);
     }
 
