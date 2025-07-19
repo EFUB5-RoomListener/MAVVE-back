@@ -14,6 +14,7 @@ public enum ClientExceptionCode {
     INTERNAL_SERVER_ERROR,
 
     ROOM_NOT_FOUND,
+    ROOM_OWNER_MISMATCH,
     SONG_NOT_FOUND,
     SONG_LIST_EMPTY,
     ILLEGAL_PAGE_NUMBER,

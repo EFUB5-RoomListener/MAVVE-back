@@ -99,7 +99,7 @@ public class RoomService {
 
     // roomId 조회
     @Transactional(readOnly = true)
-    private Room findByRoomId(Long roomId){
+    public Room findByRoomId(Long roomId){
         return roomRepository.findByRoomId(roomId)
                 .orElseThrow(() -> new MavveException(ExceptionCode.ROOM_NOT_FOUND));
     }
