@@ -1,6 +1,8 @@
 package com.efub.mavve.room.service.websocket;
 
 import com.efub.mavve.auth.domain.User;
+import com.efub.mavve.global.exception.ExceptionCode;
+import com.efub.mavve.global.exception.MavveException;
 import com.efub.mavve.room.payload.request.AddSongRequestPayload;
 import com.efub.mavve.room.payload.request.DeleteSongRequestPayload;
 import com.efub.mavve.room.payload.response.AddSongResponsePayload;
@@ -11,7 +13,10 @@ import com.efub.mavve.room.service.redis.RoomSongRedisService;
 import com.efub.mavve.room.service.redis.RoomUserRedisService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.messaging.Message;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
+import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
+import org.springframework.messaging.support.MessageHeaderAccessor;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.stereotype.Service;
 
@@ -69,9 +74,17 @@ public class RoomSongWebsocketService {
     }
 
     // 노래 정보 받을 주소 구독 -> 사용자 정보 저장
-    public User subscribe(Long roomCode, Principal principal) {
+    public User subscribe(Long roomCode, Principal principal, Message<?> message) {
         User user = principalUtil.principalToUser(principal);
-        userRedisService.addUser(roomCode, user);
+
+        // sessionId 가져오기
+        StompHeaderAccessor accessor = MessageHeaderAccessor.getAccessor(message, StompHeaderAccessor.class);
+        if(accessor == null || accessor.getSessionId() == null){
+            throw new MavveException(ExceptionCode.NO_SESSION_ID);
+        }
+        String sessionId = accessor.getSessionId();
+
+        userRedisService.addUser(roomCode, user, sessionId);
         return user;
     }
 }

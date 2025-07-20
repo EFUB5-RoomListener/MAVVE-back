@@ -45,7 +45,10 @@ public enum ExceptionCode {
     REDIS_DESERIALIZATION_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, ClientExceptionCode.REDIS_DESERIALIZATION_ERROR, "Redis값 역직렬화에 실패했습니다."),
 
     //방
-    ROOM_OWNER_MISMATCH(HttpStatus.UNAUTHORIZED, ClientExceptionCode.ROOM_OWNER_MISMATCH, "방에 대한 권한이 없습니다.");
+    ROOM_OWNER_MISMATCH(HttpStatus.UNAUTHORIZED, ClientExceptionCode.ROOM_OWNER_MISMATCH, "방에 대한 권한이 없습니다."),
+
+    //웹소켓
+    NO_SESSION_ID(HttpStatus.INTERNAL_SERVER_ERROR, ClientExceptionCode.NO_SESSION_ID, "웹소켓 subscribe 요청에 sessionId가 없음.");
 
     private final HttpStatus httpStatus;
     private final ClientExceptionCode clientExceptionCode;

@@ -6,6 +6,9 @@ public class RoomRedisKeyUtils {
     public static final String CURRENT_SONG_SUFFIX = ":current";
     public static final String INSIDE_USERS_SUFFIX = ":users";
 
+    public static final String USER_PREFIX = "user:";
+    public static final String ROOM_SUFFIX = ":room";
+
     public static String getSongListKey(Long roomCode) {
         return ROOM_PREFIX + roomCode + SONG_LIST_SUFFIX;
     }
@@ -16,5 +19,9 @@ public class RoomRedisKeyUtils {
 
     public static String getUserListKey(Long roomCode) {
         return ROOM_PREFIX + roomCode + INSIDE_USERS_SUFFIX;
+    }
+
+    public static String getUserRoomKey(String sessionId) {
+        return USER_PREFIX + sessionId + ROOM_SUFFIX;
     }
 }

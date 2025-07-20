@@ -10,6 +10,7 @@ import com.efub.mavve.room.payload.response.SubscribeResponsePayload;
 import com.efub.mavve.room.service.websocket.RoomSongWebsocketService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.messaging.Message;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
@@ -27,8 +28,10 @@ public class RoomSongWebsocketController {
     private final RoomSongWebsocketService roomSongWebsocketService;
 
     @SubscribeMapping("/rooms/{roomCode}/songs")
-    public SubscribeResponsePayload subscribe(@DestinationVariable Long roomCode, Principal principal) {
-        User user = roomSongWebsocketService.subscribe(roomCode, principal);
+    public SubscribeResponsePayload subscribe(@DestinationVariable Long roomCode,
+                                              Principal principal,
+                                              Message<?> message) {
+        User user = roomSongWebsocketService.subscribe(roomCode, principal, message);
         log.info("user{} subscribe {} room", user.getUserId(), roomCode);
         return new SubscribeResponsePayload(MessageType.SUBSCRIBE_COMPLETE);
     }
