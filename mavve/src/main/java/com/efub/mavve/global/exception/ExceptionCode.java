@@ -30,6 +30,8 @@ public enum ExceptionCode {
     ILLEGAL_PAGE_SIZE(HttpStatus.BAD_REQUEST, ClientExceptionCode.ILLEGAL_PAGE_SIZE, "잘못된 페이지 사이즈입니다."),
     SONG_RESULT_NOT_FOUND(HttpStatus.NOT_FOUND, ClientExceptionCode.SONG_RESULT_NOT_FOUND, "스포티파이에서 해당 노래에 대한 검색결과가 존재하지 않습니다."),
 
+    // Artist
+    ARTIST_NOT_FOUND(HttpStatus.NOT_FOUND, ClientExceptionCode.ARTIST_NOT_FOUND, "해당되는 가수가 존재하지 않습니다."),
     //플레이리스트
     PLAYLIST_NOT_FOUND(HttpStatus.NOT_FOUND, ClientExceptionCode.PLAYLIST_NOT_FOUND, "해당되는 플레이리스트가 존재하지 않습니다."),
     TITLE_ALREADY_EXIST(HttpStatus.CONFLICT, ClientExceptionCode.TITLE_ALREADY_EXIST, "이미 존재하는 이름의 플레이리스트입니다."),
@@ -49,6 +51,9 @@ public enum ExceptionCode {
 
     //웹소켓
     NO_SESSION_ID(HttpStatus.INTERNAL_SERVER_ERROR, ClientExceptionCode.NO_SESSION_ID, "웹소켓 subscribe 요청에 sessionId가 없음.");
+
+    // 한 줄 일기
+    DIARY_NOT_FOUND(HttpStatus.NOT_FOUND, ClientExceptionCode.DIARY_NOT_FOUND, "해당되는 일기가 존재하지 않습니다.");
 
     private final HttpStatus httpStatus;
     private final ClientExceptionCode clientExceptionCode;

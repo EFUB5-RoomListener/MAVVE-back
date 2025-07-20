@@ -16,8 +16,6 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
-import java.util.HashMap;
-import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -52,7 +50,7 @@ public class RoomController {
         return ResponseEntity.noContent().build();
     }
 
-    // 방 리스트 조회
+    // 공개된 방 리스트 전체 조회
     @GetMapping
     public ResponseEntity<RoomListResponse> getListRoom(){
         RoomListResponse response = roomService.getListRoom();
@@ -67,17 +65,31 @@ public class RoomController {
     }
 
 
-    // 조회순 방 리스트 5개 조회
+    // 조회순으로 공개된 방 리스트 Top5 조회
     @GetMapping("/hot")
     public ResponseEntity<RoomListResponse> getHotListRoom(){
         RoomListResponse response = roomService.getHotListRoom();
         return ResponseEntity.ok(response);
     }
 
+    // 좋아요 순으로 TOP5 공개된 방 조회
+    @GetMapping("/like")
+    public ResponseEntity<RoomListResponse> getLikeListRoom(){
+        RoomListResponse response = roomService.getLikeListRoom();
+        return ResponseEntity.ok(response);
+    }
+
+    // 방 검색
+    @GetMapping("/search")
+    public ResponseEntity<RoomListResponse> searchRoom(@RequestParam("keyword") String keyword){
+        RoomListResponse response = roomService.searchRoom(keyword);
+        return ResponseEntity.ok(response);
+    }
+
     // 방 좋아요
     @PostMapping("/{roomId}/like")
     public ResponseEntity<RoomLikeResponse> roomLike(@PathVariable("roomId") Long roomId,
-                                                        @AuthenticationPrincipal User user) {
+                                                     @AuthenticationPrincipal User user) {
         RoomLikeResponse response = roomLikeService.roomLike(roomId, user);
         return ResponseEntity.ok(response);
     }

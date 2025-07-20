@@ -1,10 +1,10 @@
 package com.efub.mavve.room.service;
 
 import com.efub.mavve.auth.domain.User;
-import com.efub.mavve.auth.repository.UserRepository;
 import com.efub.mavve.global.exception.ExceptionCode;
 import com.efub.mavve.global.exception.MavveException;
 import com.efub.mavve.room.domain.Room;
+import com.efub.mavve.room.dto.projection.RoomLikeCountProjection;
 import com.efub.mavve.room.dto.request.RoomCreateRequest;
 import com.efub.mavve.room.dto.request.RoomUpdateRequest;
 import com.efub.mavve.room.dto.response.RoomEnterResponse;
@@ -19,6 +19,8 @@ import com.efub.mavve.room.service.websocket.RoomSongWebsocketService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import com.efub.mavve.room.repository.RoomLikeRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,42 +37,46 @@ public class RoomService {
     private final RoomSongRedisService roomSongRedisService;
     private final RoomUserRedisService roomUserRedisService;
     private final RoomSongWebsocketService roomSongWebsocketService;
+    private final RoomLikeRepository roomLikeRepository;
 
     // 방 생성
     @Transactional
-    public RoomResponse createRoom(@Valid RoomCreateRequest request, User user){
+    public RoomResponse createRoom(RoomCreateRequest request, User user){
         Room room = roomRepository.save(request.toEntity(user));
-        return RoomResponse.from(room);
+        return RoomResponse.from(room, 0);
     }
 
     // 방 수정
     @Transactional
-    public RoomResponse updateRoom(Long roomId, @Valid RoomUpdateRequest request, User user){
+    public RoomResponse updateRoom(Long roomId, RoomUpdateRequest request, User user){
         Room room = findByRoomId(roomId);
         authorizeUser(user, room);
-        room.changeRoomName(request.roomName());
-        room.changeTag(request.tag());
+
+        if(request.roomName()!=null){room.changeRoomName(request.roomName());}
+        if(request.tag()!=null){room.changeTag(request.tag());}
         room.changeIsPublic(request.isPublic());
-        return RoomResponse.from(room);
+        int likeCount = roomLikeRepository.countByRoom(room);
+
+        return RoomResponse.from(room, likeCount);
     }
-    
 
     // 방 삭제
     @Transactional
     public void deleteRoom(Long roomId, User user){
-        Room room = roomRepository.findByRoomId(roomId).
-                orElseThrow(()-> new MavveException(ExceptionCode.ROOM_NOT_FOUND));
+        Room room = findByRoomId(roomId);
         authorizeUser(user, room); // 방장인지 확인
         roomRepository.delete(room);
     }
 
-    // 방 리스트 조회
+    // 공개된 방 리스트 전체 조회
     @Transactional(readOnly = true)
     public RoomListResponse getListRoom() {
         List<Room> roomList = roomRepository.findAll();
 
-        List<RoomResponse> responseList = roomList.stream()
-                .map(RoomResponse::from)
+        List<RoomResponse> responseList = roomList.stream().filter(Room::isPublic)
+                .map(room -> {
+                    int likeCount = roomLikeRepository.countByRoom(room);
+                    return RoomResponse.from(room, likeCount);})
                 .collect(Collectors.toList());
 
         return RoomListResponse.from(responseList);
@@ -82,29 +88,52 @@ public class RoomService {
         List<Room> roomList = roomRepository.findByUser(user);
 
         List<RoomResponse> responseList = roomList.stream()
-                .map(RoomResponse::from)
+                .map(room -> {
+                    int likeCount = roomLikeRepository.countByRoom(room);
+                    return RoomResponse.from(room, likeCount);})
                 .collect(Collectors.toList());
 
         return RoomListResponse.from(responseList);
     }
 
-    // 조회순 방 리스트 조회
+    // 조회순으로 공개된 방 리스트 Top5 조회
     @Transactional(readOnly = true)
     public RoomListResponse getHotListRoom(){
         List<Room> roomList = roomRepository.findTop5ByIsPublicTrueOrderByViewCountDesc();
 
         List<RoomResponse> responseList = roomList.stream()
-                .map(RoomResponse::from)
+                .map(room -> {
+                    int likeCount = roomLikeRepository.countByRoom(room);
+                    return RoomResponse.from(room, likeCount);})
                 .collect(Collectors.toList());
-
         return RoomListResponse.from(responseList);
     }
 
-    // userId 조회
+    // 좋아요 순으로 TOP5 공개된 방 조회
     @Transactional(readOnly = true)
-    private User findByUserId(Long userId){
-        return userRepository.findByUserId(userId)
-                .orElseThrow(() -> new MavveException(ExceptionCode.USER_NOT_FOUND));
+    public RoomListResponse getLikeListRoom(){
+        List<RoomLikeCountProjection> projection = roomRepository.findTop5ByIsPublicTrueOrderByLikeCountDesc();
+
+        List<RoomResponse> responseList = projection.stream()
+                .map(proj -> {
+                    Room room = findByRoomId(proj.getRoomId());
+                    int likeCount = roomLikeRepository.countByRoom(room);
+                    return RoomResponse.from(room, likeCount);})
+                .collect(Collectors.toList());
+        return RoomListResponse.from(responseList);
+    }
+
+    // 방 검색
+    @Transactional(readOnly = true)
+    public RoomListResponse searchRoom(String keyword){
+        List<Room> roomList = roomRepository.findByRoomNameContainingIgnoreCaseAndIsPublicTrueOrderByCreatedAtDesc(keyword);
+
+        List<RoomResponse> responseList = roomList.stream()
+                .map(room -> {
+                    int likeCount = roomLikeRepository.countByRoom(room);
+                    return RoomResponse.from(room, likeCount);})
+                .collect(Collectors.toList());
+        return RoomListResponse.from(responseList);
     }
 
     // roomId 조회
@@ -120,7 +149,6 @@ public class RoomService {
             throw new MavveException(ExceptionCode.ROOM_OWNER_MISMATCH);
         }
     }
-
 
     // 방 입장 시 방 정보 + 플레이리스트 + 현재 재생중인 노래 전달
     @Transactional(readOnly = true)
