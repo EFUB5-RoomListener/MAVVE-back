@@ -9,12 +9,4 @@ import java.util.List;
 public record RoomUpdateRequest (String roomName,
                                 List<String> tag,
                                 boolean isPublic){
-    public Room toEntity(User user){
-        return Room.builder()
-                .user(user)
-                .roomName(roomName())
-                .tag(tag())
-                .isPublic(isPublic())
-                .build();
-    }
 }
