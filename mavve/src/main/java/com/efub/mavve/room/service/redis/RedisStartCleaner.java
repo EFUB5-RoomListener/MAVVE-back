@@ -17,16 +17,23 @@ public class RedisStartCleaner {
 
     @PostConstruct
     public void cleanUpUsersAndCurrentSong() {
-        // users 키 삭제
-        Set<String> userKeys = redisTemplate.keys(RoomRedisKeyUtils.ROOM_PREFIX + "*"
-                + RoomRedisKeyUtils.INSIDE_USERS_SUFFIX);
-        if (userKeys != null && !userKeys.isEmpty()) {
-            redisTemplate.delete(userKeys);
+        // rooms:{roomId}:users 삭제
+        Set<String> userListKeys = redisTemplate.keys(
+                RoomRedisKeyUtils.ROOM_PREFIX + "*" + RoomRedisKeyUtils.INSIDE_USERS_SUFFIX);
+        if (userListKeys != null && !userListKeys.isEmpty()) {
+            redisTemplate.delete(userListKeys);
+        }
+        
+        // user:{sessionId}:room 삭제
+        Set<String> userRoomKeys = redisTemplate.keys(
+                RoomRedisKeyUtils.USER_PREFIX + "*" + RoomRedisKeyUtils.ROOM_SUFFIX);
+        if(userRoomKeys != null && !userRoomKeys.isEmpty()){
+            redisTemplate.delete(userRoomKeys);
         }
 
-        // current song 키 삭제
-        Set<String> currentSongKeys = redisTemplate.keys(RoomRedisKeyUtils.ROOM_PREFIX + "*"
-                + RoomRedisKeyUtils.CURRENT_SONG_SUFFIX);
+        // rooms:{roomId}:current 삭제
+        Set<String> currentSongKeys = redisTemplate.keys(
+                RoomRedisKeyUtils.ROOM_PREFIX + "*" + RoomRedisKeyUtils.CURRENT_SONG_SUFFIX);
         if (currentSongKeys != null && !currentSongKeys.isEmpty()) {
             redisTemplate.delete(currentSongKeys);
         }
