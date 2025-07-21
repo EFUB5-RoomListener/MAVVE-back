@@ -3,13 +3,16 @@ package com.efub.mavve.room.controller;
 import com.efub.mavve.auth.domain.User;
 import com.efub.mavve.room.dto.request.RoomCreateRequest;
 import com.efub.mavve.room.dto.request.RoomUpdateRequest;
+import com.efub.mavve.room.dto.response.ChatListResponse;
 import com.efub.mavve.room.dto.response.RoomLikeResponse;
 import com.efub.mavve.room.dto.response.RoomListResponse;
 import com.efub.mavve.room.dto.response.RoomResponse;
+import com.efub.mavve.room.service.RoomChatService;
 import com.efub.mavve.room.service.RoomLikeService;
 import com.efub.mavve.room.service.RoomService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -22,6 +25,8 @@ import java.net.URI;
 public class RoomController {
     private final RoomService roomService;
     private final RoomLikeService roomLikeService;
+    private final RoomChatService roomChatService;
+
     // 방 생성
     @PostMapping
     public ResponseEntity<RoomResponse> createRoom(@AuthenticationPrincipal User user,
@@ -92,4 +97,11 @@ public class RoomController {
         return ResponseEntity.ok(response);
     }
 
+    // 채팅 전체 조회(페이징)
+    @GetMapping("/{roomId}/chats")
+    public ResponseEntity<ChatListResponse> getAllChats(@PathVariable("roomId") Long roomId,
+                                                        @RequestParam(value = "lastChatId", required = false) Long lastChatId){
+        ChatListResponse response = roomChatService.getAllChats(roomId, lastChatId);
+        return ResponseEntity.ok(response);
+    }
 }
