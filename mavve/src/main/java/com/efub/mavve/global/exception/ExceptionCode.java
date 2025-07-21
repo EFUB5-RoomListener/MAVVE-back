@@ -20,6 +20,7 @@ public enum ExceptionCode {
     AUTH_TOKEN_INVALID(HttpStatus.UNAUTHORIZED, ClientExceptionCode.AUTH_TOKEN_INVALID, "올바르지 않은 토큰 정보입니다."),
     AUTH_TOKEN_MISMATCH(HttpStatus.UNAUTHORIZED, ClientExceptionCode.AUTH_TOKEN_MISMATCH, "액세스 토큰과 리프레시 토큰의 소유자가 일치하지 않습니다."),
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, ClientExceptionCode.USER_NOT_FOUND, "찾을 수 없는 유저입니다."),
+    ALREADY_LOGGED_TOKEN(HttpStatus.UNAUTHORIZED, ClientExceptionCode.ALREADY_LOGGED_TOKEN, "로그아웃된 토큰입니다."),
 
     ROOM_NOT_FOUND(HttpStatus.NOT_FOUND, ClientExceptionCode.ROOM_NOT_FOUND, "해당되는 방이 존재하지 않습니다."),
 
@@ -30,6 +31,8 @@ public enum ExceptionCode {
     ILLEGAL_PAGE_SIZE(HttpStatus.BAD_REQUEST, ClientExceptionCode.ILLEGAL_PAGE_SIZE, "잘못된 페이지 사이즈입니다."),
     SONG_RESULT_NOT_FOUND(HttpStatus.NOT_FOUND, ClientExceptionCode.SONG_RESULT_NOT_FOUND, "스포티파이에서 해당 노래에 대한 검색결과가 존재하지 않습니다."),
 
+    // Artist
+    ARTIST_NOT_FOUND(HttpStatus.NOT_FOUND, ClientExceptionCode.ARTIST_NOT_FOUND, "해당되는 가수가 존재하지 않습니다."),
     //플레이리스트
     PLAYLIST_NOT_FOUND(HttpStatus.NOT_FOUND, ClientExceptionCode.PLAYLIST_NOT_FOUND, "해당되는 플레이리스트가 존재하지 않습니다."),
     TITLE_ALREADY_EXIST(HttpStatus.CONFLICT, ClientExceptionCode.TITLE_ALREADY_EXIST, "이미 존재하는 이름의 플레이리스트입니다."),
@@ -43,7 +46,16 @@ public enum ExceptionCode {
     //redis
     REDIS_SAVE_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, ClientExceptionCode.REDIS_SAVE_ERROR, "노래 저장 중 예상치 못한 에러가 발생했습니다."),
     REDIS_DELETE_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, ClientExceptionCode.REDIS_DELETE_ERROR, "노래 삭제 중 예상치 못한 에러가 발생했습니다."),
-    REDIS_DESERIALIZATION_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, ClientExceptionCode.REDIS_DESERIALIZATION_ERROR, "Redis값 역직렬화에 실패했습니다.");
+    REDIS_DESERIALIZATION_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, ClientExceptionCode.REDIS_DESERIALIZATION_ERROR, "Redis값 역직렬화에 실패했습니다."),
+
+    //방
+    ROOM_OWNER_MISMATCH(HttpStatus.UNAUTHORIZED, ClientExceptionCode.ROOM_OWNER_MISMATCH, "방에 대한 권한이 없습니다."),
+
+    //웹소켓
+    NO_SESSION_ID(HttpStatus.INTERNAL_SERVER_ERROR, ClientExceptionCode.NO_SESSION_ID, "웹소켓 subscribe 요청에 sessionId가 없음."),
+
+    // 한 줄 일기
+    DIARY_NOT_FOUND(HttpStatus.NOT_FOUND, ClientExceptionCode.DIARY_NOT_FOUND, "해당되는 일기가 존재하지 않습니다.");
 
     private final HttpStatus httpStatus;
     private final ClientExceptionCode clientExceptionCode;
