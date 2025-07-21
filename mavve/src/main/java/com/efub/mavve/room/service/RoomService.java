@@ -33,7 +33,6 @@ import java.util.stream.Collectors;
 @Slf4j
 public class RoomService {
     private final RoomRepository roomRepository;
-    private final UserRepository userRepository;
     private final RoomSongRedisService roomSongRedisService;
     private final RoomUserRedisService roomUserRedisService;
     private final RoomSongWebsocketService roomSongWebsocketService;
