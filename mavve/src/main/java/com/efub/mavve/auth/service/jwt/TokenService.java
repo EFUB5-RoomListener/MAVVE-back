@@ -1,14 +1,17 @@
 package com.efub.mavve.auth.service.jwt;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
+import java.util.concurrent.TimeUnit;
 
 @Service
 @RequiredArgsConstructor
-public class RefreshTokenService {
+@Slf4j
+public class TokenService {
     private static final String REFRESHPRIFIX = "RT";
     private final StringRedisTemplate stringRedisTemplate;
 
@@ -28,5 +31,11 @@ public class RefreshTokenService {
     public boolean existsRefreshToken(String userId, String refreshToken) {
         String storedRefreshToken = getRefreshToken(userId);
         return storedRefreshToken != null & refreshToken.equals(storedRefreshToken);
+    }
+
+    public void registerBlackList(String accessToken, long expiration){
+        log.info("Registering token in blacklist: {} with TTL: {}ms", accessToken, expiration);
+        stringRedisTemplate.opsForValue()
+                .set("blacklist:" + accessToken, "logout", expiration, TimeUnit.MILLISECONDS);
     }
 }
