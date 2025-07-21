@@ -3,6 +3,7 @@ package com.efub.mavve.room.controller;
 import com.efub.mavve.auth.domain.User;
 import com.efub.mavve.room.dto.request.RoomCreateRequest;
 import com.efub.mavve.room.dto.request.RoomUpdateRequest;
+import com.efub.mavve.room.dto.response.RoomEnterResponse;
 import com.efub.mavve.room.dto.response.RoomLikeResponse;
 import com.efub.mavve.room.dto.response.RoomListResponse;
 import com.efub.mavve.room.dto.response.RoomResponse;
@@ -22,6 +23,7 @@ import java.net.URI;
 public class RoomController {
     private final RoomService roomService;
     private final RoomLikeService roomLikeService;
+
     // 방 생성
     @PostMapping
     public ResponseEntity<RoomResponse> createRoom(@AuthenticationPrincipal User user,
@@ -89,6 +91,13 @@ public class RoomController {
     public ResponseEntity<RoomLikeResponse> roomLike(@PathVariable("roomId") Long roomId,
                                                      @AuthenticationPrincipal User user) {
         RoomLikeResponse response = roomLikeService.roomLike(roomId, user);
+        return ResponseEntity.ok(response);
+    }
+
+    // 방 입장
+    @GetMapping("/{roomId}/enter")
+    public ResponseEntity<RoomEnterResponse> getRoomEnterInfo(@PathVariable("roomId") Long roomId){
+        RoomEnterResponse response = roomService.getRoomEnterInfo(roomId);
         return ResponseEntity.ok(response);
     }
 

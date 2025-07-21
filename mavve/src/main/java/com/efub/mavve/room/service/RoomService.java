@@ -7,21 +7,36 @@ import com.efub.mavve.room.domain.Room;
 import com.efub.mavve.room.dto.projection.RoomLikeCountProjection;
 import com.efub.mavve.room.dto.request.RoomCreateRequest;
 import com.efub.mavve.room.dto.request.RoomUpdateRequest;
+import com.efub.mavve.room.dto.response.RoomEnterResponse;
 import com.efub.mavve.room.dto.response.RoomListResponse;
 import com.efub.mavve.room.dto.response.RoomResponse;
-import com.efub.mavve.room.repository.RoomLikeRepository;
+import com.efub.mavve.room.payload.summary.CurrentSongSummary;
+import com.efub.mavve.room.payload.summary.SongSummary;
 import com.efub.mavve.room.repository.RoomRepository;
+import com.efub.mavve.room.service.redis.RoomSongRedisService;
+import com.efub.mavve.room.service.redis.RoomUserRedisService;
+import com.efub.mavve.room.service.websocket.RoomSongWebsocketService;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import com.efub.mavve.room.repository.RoomLikeRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class RoomService {
     private final RoomRepository roomRepository;
+    private final UserRepository userRepository;
+    private final RoomSongRedisService roomSongRedisService;
+    private final RoomUserRedisService roomUserRedisService;
+    private final RoomSongWebsocketService roomSongWebsocketService;
     private final RoomLikeRepository roomLikeRepository;
 
     // 방 생성
@@ -135,5 +150,49 @@ public class RoomService {
         }
     }
 
+    // 방 입장 시 방 정보 + 플레이리스트 + 현재 재생중인 노래 전달
+    @Transactional(readOnly = true)
+    public RoomEnterResponse getRoomEnterInfo(Long roomId) {
+        Room room = findByRoomId(roomId);
+        List<SongSummary> songList = roomSongRedisService.getAllSongsInRoom(roomId);
+        log.info("song count : {}", songList.size());
+        String duration = getTotalDurationTime(songList);
 
+        CurrentSongSummary currentSong = handleFirstEnter(roomId, songList);
+        return RoomEnterResponse.from(room, songList, duration, currentSong);
+    }
+
+    // 첫 입장자인 경우 처리
+    private CurrentSongSummary handleFirstEnter(Long roomId, List<SongSummary> songList) {
+        if (!roomUserRedisService.hasUsers(roomId)) {
+            SongSummary firstSong = roomSongRedisService.getFirstSongInRoom(roomId);
+            if (firstSong != null) {
+                log.info("first user!!");
+                LocalDateTime startTime = LocalDateTime.now();
+
+                // 현재 노래 저장 및 다음 노래 스케쥴링
+                roomSongRedisService.addCurrentSong(roomId, firstSong, startTime);
+                roomSongWebsocketService.scheduleNextSong(roomId, firstSong);
+                return CurrentSongSummary.from(firstSong, startTime);
+            } else {
+                throw new MavveException(ExceptionCode.SONG_LIST_EMPTY);
+            }
+        }
+        return roomSongRedisService.getCurrentSong(roomId);
+    }
+
+    // 노래 총 재생시간 String으로 변환
+    private String getTotalDurationTime(List<SongSummary> songs){
+        int totalSeconds = songs.stream()
+                .mapToInt(SongSummary::getDuration)
+                .sum();
+
+        int hours = totalSeconds / 3600;
+        int minutes = (totalSeconds % 3600) / 60;
+        int seconds = totalSeconds % 60;
+
+        if(hours > 0) return String.format("%d시간 %d분 %d초", hours, minutes, seconds);
+        else if (minutes > 0) return String.format("%d분 %d초", minutes, seconds);
+        else return String.format("%d초", seconds);
+    }
 }

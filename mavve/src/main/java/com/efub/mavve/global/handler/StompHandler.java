@@ -49,7 +49,8 @@ public class StompHandler implements ChannelInterceptor {
 
                     Authentication authentication = new UsernamePasswordAuthenticationToken(user, null, userDetails.getAuthorities());
                     accessor.setUser(authentication);
-                    SecurityContextHolder.getContext().setAuthentication(authentication);
+                    SecurityContextHolder.getContext().setAuthentication(authentication);   //@AuthenticationPrincipal 어노테이션 사용
+                    log.info("websocket connect");
                 }
             } catch (CustomAuthenticationException e) {
                 throw new MessagingException("STOMP 연결 실패: " + e.getMessage(), e);

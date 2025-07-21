@@ -49,6 +49,9 @@ public enum ExceptionCode {
     //방
     ROOM_OWNER_MISMATCH(HttpStatus.UNAUTHORIZED, ClientExceptionCode.ROOM_OWNER_MISMATCH, "방에 대한 권한이 없습니다."),
 
+    //웹소켓
+    NO_SESSION_ID(HttpStatus.INTERNAL_SERVER_ERROR, ClientExceptionCode.NO_SESSION_ID, "웹소켓 subscribe 요청에 sessionId가 없음.");
+
     // 한 줄 일기
     DIARY_NOT_FOUND(HttpStatus.NOT_FOUND, ClientExceptionCode.DIARY_NOT_FOUND, "해당되는 일기가 존재하지 않습니다.");
 

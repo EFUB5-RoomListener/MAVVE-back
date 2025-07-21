@@ -33,6 +33,5 @@ public enum ClientExceptionCode {
     REDIS_SAVE_ERROR,
     REDIS_DELETE_ERROR,
     REDIS_DESERIALIZATION_ERROR,
-
-    ROOM_OWNER_MISMATCH,
+    NO_SESSION_ID,
 }
