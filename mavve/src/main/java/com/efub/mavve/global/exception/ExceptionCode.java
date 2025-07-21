@@ -36,6 +36,7 @@ public enum ExceptionCode {
     //플레이리스트
     PLAYLIST_NOT_FOUND(HttpStatus.NOT_FOUND, ClientExceptionCode.PLAYLIST_NOT_FOUND, "해당되는 플레이리스트가 존재하지 않습니다."),
     TITLE_ALREADY_EXIST(HttpStatus.CONFLICT, ClientExceptionCode.TITLE_ALREADY_EXIST, "이미 존재하는 이름의 플레이리스트입니다."),
+    SONG_NOT_IN_PLAYLIST(HttpStatus.NOT_FOUND, ClientExceptionCode.SONG_NOT_IN_PLAYLIST, "해당 플레이리스트에 해당 노래가 존재하지 않습니다."),
 
     //이미지
     IMAGE_UPLOAD_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, ClientExceptionCode.IMAGE_UPLOAD_FAILED, "이미지 업로드에 실패하였습니다."),

@@ -4,6 +4,7 @@ import com.efub.mavve.auth.domain.User;
 import com.efub.mavve.global.exception.ExceptionCode;
 import com.efub.mavve.global.exception.MavveException;
 import com.efub.mavve.playlist.domain.Playlist;
+import com.efub.mavve.playlist.domain.PlaylistSong;
 import com.efub.mavve.playlist.dto.request.AddSongRequest;
 import com.efub.mavve.playlist.dto.request.PlaylistCreateRequest;
 import com.efub.mavve.playlist.dto.request.PlaylistUpdateRequest;
@@ -29,6 +30,7 @@ public class PlaylistService {
 
     private final PlaylistRepository playlistRepository;
     private final SongShareService songShareService;
+    private final PlaylistSongService playlistSongService;
 
     // 플레이리스트 생성
     @Transactional
@@ -112,6 +114,15 @@ public class PlaylistService {
         playlist.addSong(newSong);
         // 해당 노래에 대한 정보를 return
         return SongResponse.fromSongEntity(newSong);
+    }
+
+    @Transactional
+    public void deleteSongInPlaylist(User user, Long playlistId, Long songId) {
+        Playlist playlist = getPlaylistOrThrow(playlistId);
+        validatePlaylistOwner(playlist, user);
+        Song song = songShareService.getSongBySongId(songId);
+        PlaylistSong target = playlistSongService.getPlaylistSongByPlaylistAndSong(playlist, song);
+        playlist.removeSong(song, target);
     }
 
     // 로그인한 사용자와 플레이리스트 소유자가 같은지 확인

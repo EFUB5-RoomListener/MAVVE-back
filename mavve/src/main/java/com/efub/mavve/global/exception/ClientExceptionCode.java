@@ -26,6 +26,7 @@ public enum ClientExceptionCode {
 
     PLAYLIST_NOT_FOUND,
     TITLE_ALREADY_EXIST,
+    SONG_NOT_IN_PLAYLIST,
 
     IMAGE_UPLOAD_FAILED,
     NO_FILE_PROVIDED,

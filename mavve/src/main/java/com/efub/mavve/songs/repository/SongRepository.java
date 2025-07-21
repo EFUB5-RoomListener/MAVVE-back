@@ -9,5 +9,6 @@ public interface SongRepository extends JpaRepository<Song, Long> {
 
     boolean existsBySpotifySongId(String spotifySongId);
     Optional<Song> findBySpotifySongId(String spotifySongId);
+    Optional<Song> findBySongId(Long songId);
 
 }
