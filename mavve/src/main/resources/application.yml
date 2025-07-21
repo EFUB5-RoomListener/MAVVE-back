@@ -49,4 +49,3 @@ spotify:
 server:
   tomcat:
     uri-encoding: UTF-8
-
