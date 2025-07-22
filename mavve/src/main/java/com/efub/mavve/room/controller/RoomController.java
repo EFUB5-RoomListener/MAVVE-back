@@ -1,6 +1,7 @@
 package com.efub.mavve.room.controller;
 
 import com.efub.mavve.auth.domain.User;
+import com.efub.mavve.playlist.dto.summary.PlaylistSummary;
 import com.efub.mavve.room.dto.request.RoomCreateRequest;
 import com.efub.mavve.room.dto.request.RoomUpdateRequest;
 import com.efub.mavve.room.dto.response.RoomEnterResponse;
@@ -8,6 +9,7 @@ import com.efub.mavve.room.dto.response.RoomLikeResponse;
 import com.efub.mavve.room.dto.response.RoomListResponse;
 import com.efub.mavve.room.dto.response.RoomResponse;
 import com.efub.mavve.room.service.RoomLikeService;
+import com.efub.mavve.room.service.RoomPlaylistService;
 import com.efub.mavve.room.service.RoomService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +18,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -23,6 +26,7 @@ import java.net.URI;
 public class RoomController {
     private final RoomService roomService;
     private final RoomLikeService roomLikeService;
+    private final RoomPlaylistService roomPlaylistService;
 
     // 방 생성
     @PostMapping
@@ -58,7 +62,7 @@ public class RoomController {
     }
 
     // 내가 만든 방 리스트 조회
-    @GetMapping("/users")
+    @GetMapping("/me")
     public ResponseEntity<RoomListResponse> getUserListRoom(@AuthenticationPrincipal User user){
         RoomListResponse response = roomService.getUserListRoom(user);
         return ResponseEntity.ok(response);
@@ -98,6 +102,20 @@ public class RoomController {
     @GetMapping("/{roomId}/enter")
     public ResponseEntity<RoomEnterResponse> getRoomEnterInfo(@PathVariable("roomId") Long roomId){
         RoomEnterResponse response = roomService.getRoomEnterInfo(roomId);
+        return ResponseEntity.ok(response);
+    }
+
+    // 방에 플레이리스트 추가
+    @PostMapping("/{roomId}/playlists")
+    public void addPlaylistInRoom(@PathVariable("roomId") Long roomId,
+                                  @RequestParam("playlistId") Long playlistId){
+        roomPlaylistService.addPlaylistInRoom(roomId, playlistId);
+    }
+
+    // 방의 플레이리스트 조회
+    @GetMapping("/{roomId}/playlists")
+    public ResponseEntity<List<PlaylistSummary>> getPlaylistInRoom(@PathVariable("roomId") Long roomId){
+        List<PlaylistSummary> response = roomPlaylistService.getPlaylistInRoom(roomId);
         return ResponseEntity.ok(response);
     }
 
