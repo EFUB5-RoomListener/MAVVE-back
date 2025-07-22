@@ -11,10 +11,10 @@ import java.time.LocalDateTime;
 @Getter
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class CurrentSongSummary {
-    SongSummary song;
+    SongRedis song;
     LocalDateTime startTime;
 
-    public static CurrentSongSummary from(SongSummary song, LocalDateTime startTime){
+    public static CurrentSongSummary from(SongRedis song, LocalDateTime startTime){
         return CurrentSongSummary.builder()
                 .song(song)
                 .startTime(startTime)
