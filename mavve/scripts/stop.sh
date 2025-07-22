@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
-PROJECT_ROOT="/home/ubuntu/MAVVE-back"
-JAR_FILE="$PROJECT_ROOT/mavve-webapp.jar"
+PROJECT_ROOT="/home/ubuntu/MAVVE-back/mavve"
+JAR_FILE="$PROJECT_ROOT/build/libs/mavve-0.0.1-SNAPSHOT.jar"
 
 DEPLOY_LOG="$PROJECT_ROOT/deploy.log"
 
