@@ -28,6 +28,9 @@ set -a
 source /home/ubuntu/app/.env
 set +a
 
+echo ">>> 🔍 환경변수 확인" >> $LOG_PATH
+env | grep DB_ >> $LOG_PATH
+
 DEPLOY_JAR=$DEPLOY_PATH$JAR_NAME
 echo ">>> 🚀 애플리케이션 실행: $DEPLOY_JAR" >> $LOG_PATH
 nohup java -jar $DEPLOY_JAR >> $LOG_PATH 2>> $ERROR_LOG_PATH &
