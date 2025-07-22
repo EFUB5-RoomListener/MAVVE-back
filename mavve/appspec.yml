@@ -2,12 +2,8 @@ version: 0.0
 os: linux
 
 files:
-  - source: mavve/src/main/resources/application.yml
-    destination: /home/ubuntu/MAVVE-back/mavve/src/main/resources/
-    overwrite: yes
-  
-  - source: build/libs/
-    destination: /home/ubuntu/MAVVE-back/build/libs
+  - source: /
+    destination: /home/ubuntu/MAVVE-back
     overwrite: yes
 file_exists_behavior: OVERWRITE
 
