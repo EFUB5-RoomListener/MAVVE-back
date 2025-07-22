@@ -42,6 +42,12 @@ public class SongShareService {
     }
 
     @Transactional
+    public Song getSongBySongId(Long songId) {
+        return songRepository.findBySongId(songId)
+                .orElseThrow(()-> new MavveException(ExceptionCode.SONG_NOT_FOUND));
+    }
+
+    @Transactional
     public Song saveSongBySpotifySongId(String spotifySongId, User user) {
         String userId = user.getUserId().toString();
         String accessToken = spotifyTokenService.getAccessToken(userId);

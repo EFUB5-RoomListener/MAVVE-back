@@ -4,6 +4,7 @@ import com.efub.mavve.auth.domain.User;
 import com.efub.mavve.room.dto.request.RoomCreateRequest;
 import com.efub.mavve.room.dto.request.RoomUpdateRequest;
 import com.efub.mavve.room.dto.response.ChatListResponse;
+import com.efub.mavve.room.dto.response.RoomEnterResponse;
 import com.efub.mavve.room.dto.response.RoomLikeResponse;
 import com.efub.mavve.room.dto.response.RoomListResponse;
 import com.efub.mavve.room.dto.response.RoomResponse;
@@ -104,4 +105,12 @@ public class RoomController {
         ChatListResponse response = roomChatService.getAllChats(roomId, lastChatId);
         return ResponseEntity.ok(response);
     }
+
+    // 방 입장
+    @GetMapping("/{roomId}/enter")
+    public ResponseEntity<RoomEnterResponse> getRoomEnterInfo(@PathVariable("roomId") Long roomId){
+        RoomEnterResponse response = roomService.getRoomEnterInfo(roomId);
+        return ResponseEntity.ok(response);
+    }
+
 }

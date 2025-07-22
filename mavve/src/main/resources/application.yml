@@ -26,11 +26,6 @@ spring:
 jwt:
   secret:
     key: ${JWT_SECRET_KEY}
-
-youtube:
-  api:
-    key: ${YOUTUBE_KEY}
-
 cloud:
   aws:
     s3:
@@ -54,4 +49,3 @@ spotify:
 server:
   tomcat:
     uri-encoding: UTF-8
-

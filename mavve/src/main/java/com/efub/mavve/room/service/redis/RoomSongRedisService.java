@@ -2,6 +2,7 @@ package com.efub.mavve.room.service.redis;
 
 import com.efub.mavve.global.exception.ExceptionCode;
 import com.efub.mavve.global.exception.MavveException;
+import com.efub.mavve.room.payload.summary.CurrentSongSummary;
 import com.efub.mavve.room.payload.summary.SongSummary;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -37,8 +38,14 @@ public class RoomSongRedisService {
         }
     }
 
+    // 처음 노래 조회
+    public SongSummary getFirstSongInRoom(Long roomCode){
+        String key = RoomRedisKeyUtils.getSongListKey(roomCode);
+        return (SongSummary) objectRedisTemplate.opsForList().getFirst(key);
+    }
+
     // 노래 리스트 전체 조회
-    public List<SongSummary> getAllSongs(Long roomCode) {
+    public List<SongSummary> getAllSongsInRoom(Long roomCode) {
         String key = RoomRedisKeyUtils.getSongListKey(roomCode);
         List<Object> objectList = objectRedisTemplate.opsForList().range(key, 0, -1);
 
@@ -59,7 +66,7 @@ public class RoomSongRedisService {
     public void deleteSongs(Long roomCode, List<String> songIdsToRemove) {
         try{
             String key = RoomRedisKeyUtils.getSongListKey(roomCode);
-            List<SongSummary> songsInRoom = getAllSongs(roomCode);
+            List<SongSummary> songsInRoom = getAllSongsInRoom(roomCode);
 
             for(SongSummary songSummary: songsInRoom){
                 if(songIdsToRemove.contains(songSummary.getSongId())){
@@ -73,7 +80,7 @@ public class RoomSongRedisService {
 
     // 다음 노래 찾기
     public SongSummary getNextSong(Long roomCode, SongSummary currentSong){
-        List<SongSummary> songsInRoom = getAllSongs(roomCode);
+        List<SongSummary> songsInRoom = getAllSongsInRoom(roomCode);
 
         // NOTE: 에러처리가 아니라 song에 null값 담아서 보낼지 추가 고민
         if (songsInRoom.isEmpty()) {
@@ -81,7 +88,7 @@ public class RoomSongRedisService {
         }
 
         for (int i = 0; i < songsInRoom.size(); i++) {
-            if (songsInRoom.get(i).equals(currentSong)) {
+            if (songsInRoom.get(i).getSongId().equals(currentSong.getSongId())) {
                 return songsInRoom.get((i + 1) % songsInRoom.size());   //마지막 노래라면 첫번째 노래 다시 재생
             }
         }
@@ -98,8 +105,19 @@ public class RoomSongRedisService {
             map.put("song", song);
             map.put("startTime", startTime);
             objectRedisTemplate.opsForHash().putAll(key, map);
+            log.info("add current song! : {}", song.getSongId());
         } catch (Exception e) {
             throw new MavveException(ExceptionCode.REDIS_SAVE_ERROR);
         }
     }
+
+    // 현재 재생되고 있는 노래 조회
+    public CurrentSongSummary getCurrentSong(Long roomCode){
+        String key = RoomRedisKeyUtils.getCurrentSongKey(roomCode);
+        SongSummary song = (SongSummary) objectRedisTemplate.opsForHash().get(key, "song");
+        LocalDateTime startTime = (LocalDateTime) objectRedisTemplate.opsForHash().get(key, "startTime");
+
+        return CurrentSongSummary.from(song, startTime);
+    }
+
 }

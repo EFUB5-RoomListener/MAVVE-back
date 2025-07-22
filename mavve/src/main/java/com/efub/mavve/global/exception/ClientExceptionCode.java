@@ -12,6 +12,7 @@ public enum ClientExceptionCode {
     USER_NOT_FOUND,
     ILLEGAL_ARGUMENT,
     INTERNAL_SERVER_ERROR,
+    ALREADY_LOGGED_TOKEN,
 
     DIARY_NOT_FOUND,
     ROOM_NOT_FOUND,
@@ -25,6 +26,7 @@ public enum ClientExceptionCode {
 
     PLAYLIST_NOT_FOUND,
     TITLE_ALREADY_EXIST,
+    SONG_NOT_IN_PLAYLIST,
 
     IMAGE_UPLOAD_FAILED,
     NO_FILE_PROVIDED,
@@ -33,6 +35,5 @@ public enum ClientExceptionCode {
     REDIS_SAVE_ERROR,
     REDIS_DELETE_ERROR,
     REDIS_DESERIALIZATION_ERROR,
-
-    ROOM_OWNER_MISMATCH,
+    NO_SESSION_ID,
 }
