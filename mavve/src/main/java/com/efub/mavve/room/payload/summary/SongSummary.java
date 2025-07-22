@@ -3,6 +3,8 @@ package com.efub.mavve.room.payload.summary;
 import com.efub.mavve.room.service.redis.RoomSongRedisService;
 import lombok.*;
 
+import java.util.List;
+
 @Getter
 @Builder
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
@@ -10,7 +12,7 @@ import lombok.*;
 public class SongSummary {
     String spotifyId;
     String title;
-    String artist;
+    List<String> artist;
     String album;
     String coverUrl;
     int duration;
