@@ -73,7 +73,7 @@ public class RoomSongWebsocketService {
     private void broadcastNextSong(Long roomCode, SongRedis nextSong, LocalDateTime startTime){
         songRedisService.addCurrentSong(roomCode, nextSong, startTime);
         log.info("next song!");
-        messagingTemplate.convertAndSend("/topic/rooms/" + roomCode + "/songs", NextSongResponsePayload.from(nextSong));
+        messagingTemplate.convertAndSend("/topic/rooms/" + roomCode + "/songs", NextSongResponsePayload.from(nextSong, startTime));
         scheduleNextSong(roomCode, nextSong);   // 다음 노래 스케쥴링
     }
 
