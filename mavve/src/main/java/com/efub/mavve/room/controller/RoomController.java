@@ -58,12 +58,18 @@ public class RoomController {
     }
 
     // 내가 만든 방 리스트 조회
-    @GetMapping("/users")
+    @GetMapping("/me")
     public ResponseEntity<RoomListResponse> getUserListRoom(@AuthenticationPrincipal User user){
         RoomListResponse response = roomService.getUserListRoom(user);
         return ResponseEntity.ok(response);
     }
 
+    // 내가 좋아요 누른 방 리스트 조회
+    @GetMapping("/like/me")
+    public ResponseEntity<RoomListResponse> getUserLikeListRoom(@AuthenticationPrincipal User user){
+        RoomListResponse response = roomService.getUserLikeListRoom(user);
+        return ResponseEntity.ok(response);
+    }
 
     // 조회순으로 공개된 방 리스트 Top5 조회
     @GetMapping("/hot")
