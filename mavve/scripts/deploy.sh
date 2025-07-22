@@ -23,6 +23,11 @@ fi
 echo ">>> 📂 JAR 복사 중..." >> $LOG_PATH
 cp $BUILD_JAR $DEPLOY_PATH
 
+echo ">>> 🌱 환경변수(.env) 로딩..." >> $LOG_PATH
+set -a
+source /home/ubuntu/app/.env
+set +a
+
 DEPLOY_JAR=$DEPLOY_PATH$JAR_NAME
 echo ">>> 🚀 애플리케이션 실행: $DEPLOY_JAR" >> $LOG_PATH
 nohup java -jar $DEPLOY_JAR >> $LOG_PATH 2>> $ERROR_LOG_PATH &
