@@ -2,6 +2,9 @@ package com.efub.mavve.auth.service.jwt;
 
 import com.efub.mavve.auth.domain.User;
 import com.efub.mavve.global.config.CustomAuthenticationEntryPoint;
+import com.efub.mavve.global.exception.CustomAuthenticationException;
+import com.efub.mavve.global.exception.ExceptionCode;
+import com.efub.mavve.global.exception.MavveException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -30,6 +33,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
             if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
                 bearerToken = bearerToken.substring(7);
+
+                if(jwtResolver.isBlacklisted(bearerToken)){
+                    throw new CustomAuthenticationException(ExceptionCode.ALREADY_LOGGED_TOKEN, ExceptionCode.ALREADY_LOGGED_TOKEN.getMessage(), null);
+                }
+
                 String userId = jwtResolver.resolveAccessToken(bearerToken);
                 CustomUserDetails userDetails = userDetailsService.loadUserByUsername(userId);
                 User user = userDetails.getUser();

@@ -9,7 +9,7 @@ import com.efub.mavve.auth.dto.response.UserInfoResponse;
 import com.efub.mavve.auth.repository.UserRepository;
 import com.efub.mavve.auth.service.jwt.JwtProvider;
 import com.efub.mavve.auth.service.jwt.JwtResolver;
-import com.efub.mavve.auth.service.jwt.RefreshTokenService;
+import com.efub.mavve.auth.service.jwt.TokenService;
 import com.efub.mavve.auth.service.jwt.SpotifyTokenService;
 import com.efub.mavve.auth.service.oauth.OauthClient;
 import com.efub.mavve.global.exception.ExceptionCode;
@@ -29,12 +29,13 @@ public class AuthService {
 
     private final UserRepository userRepository;
     private final JwtProvider jwtProvider;
-    private final RefreshTokenService refreshTokenService;
+    private final TokenService refreshTokenService;
     private final SpotifyTokenService  spotifyTokenService;
     private final OauthClient oauthClient;
 
     private final long REFRESH_EXPIRE = 1000L * 60 * 60 * 24 * 14;
     private final JwtResolver jwtResolver;
+    private final TokenService tokenService;
 
     public SpotifyRedirctUri getRedirctUri() {
         return SpotifyRedirctUri.of(oauthClient.getRedirectUri());
@@ -66,6 +67,20 @@ public class AuthService {
         String newProfileImageUrl = userInfoRequest.getProfile();
         updateUser.updateProfile(newUsername, newProfileImageUrl);
         return UserInfoResponse.fromUserEntity(updateUser);
+    }
+
+    @Transactional
+    public void logout(User user, String accessToken, HttpServletResponse response, String refreshToken) {
+        refreshTokenService.deleteRefreshToken(user.getUserId().toString());
+        String originAccessToken = accessToken.substring(7);
+        long remainingTime = jwtResolver.getRemainingTime(originAccessToken);
+        tokenService.registerBlackList(originAccessToken, remainingTime);
+
+        Cookie cookie = new Cookie("refreshToken", null);
+        cookie.setMaxAge(0);
+        cookie.setPath("/");
+        cookie.setHttpOnly(true);
+        response.addCookie(cookie);
     }
 
     @Transactional

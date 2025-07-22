@@ -17,6 +17,8 @@ import com.efub.mavve.songs.repository.SongArtistRepository;
 import com.efub.mavve.songs.service.SongShareService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -98,6 +100,13 @@ public class DiaryService {
                 : songShareService.saveSongBySpotifySongId(spotifySongId, user);
     }
 
+    // 하루가 지나면 모든 일기 삭제
+    @Scheduled(cron = "0 0 0 * * *")
+    @Transactional
+    @Async
+    public void deleteOldDiaries() {
+        diaryRepository.deleteAll();
+    }
 
     // diaryId로 조회
     @Transactional(readOnly = true)

@@ -26,6 +26,15 @@ public class AuthController {
         return ResponseEntity.ok().build();
     }
 
+    @PostMapping("/logout")
+    public ResponseEntity<Void> logout(@AuthenticationPrincipal User user,
+                                       HttpServletResponse response,
+                                       @RequestHeader("Authorization") String accessToken,
+                                       @CookieValue(value = "refresh_token", required = true) String refreshToken) {
+        authService.logout(user, accessToken, response, refreshToken);
+        return ResponseEntity.ok().build();
+    }
+
     @GetMapping("/redirect/spotify")
     public ResponseEntity<SpotifyRedirctUri> redirectToSpotify() {
         return ResponseEntity.ok(authService.getRedirctUri());
