@@ -23,13 +23,17 @@ fi
 echo ">>> 📂 JAR 복사 중..." >> $LOG_PATH
 cp $BUILD_JAR $DEPLOY_PATH
 
-echo ">>> 🌱 환경변수(.env) 로딩..." >> $LOG_PATH
-set -a
-source /home/ubuntu/app/.env
-set +a
 
-echo ">>> 🔍 환경변수 확인" >> $LOG_PATH
-env | grep DB_ >> $LOG_PATH
+export AWS_ACCESS_KEY=$(aws ssm get-parameter --name "/mavve/AWS_ACCESS_KEY" --with-decryption --query "Parameter.Value" --output text)
+export AWS_SECRET_KEY=$(aws ssm get-parameter --name "/mavve/AWS_SECRET_KEY" --with-decryption --query "Parameter.Value" --output text)
+export CLIENT_ID=$(aws ssm get-parameter --name "/mavve/CLIENT_ID" --with-decryption --query "Parameter.Value" --output text)
+export CLIENT_SECRET=$(aws ssm get-parameter --name "/mavve/CLIENT_SECRET" --with-decryption --query "Parameter.Value" --output text)
+export DB_PASSWORD=$(aws ssm get-parameter --name "/mavve/DB_PASSWORD" --with-decryption --query "Parameter.Value" --output text)
+export DB_URL=$(aws ssm get-parameter --name "/mavve/DB_URL" --with-decryption --query "Parameter.Value" --output text)
+export DB_USERNAME=$(aws ssm get-parameter --name "/mavve/DB_USERNAME" --with-decryption --query "Parameter.Value" --output text)
+export REDIS_HOST=$(aws ssm get-parameter --name "/mavve/REDIS_HOST" --with-decryption --query "Parameter.Value" --output text)
+export S3_BUCKET_NAME=$(aws ssm get-parameter --name "/mavve/S3_BUCKET_NAME" --with-decryption --query "Parameter.Value" --output text)
+
 
 DEPLOY_JAR=$DEPLOY_PATH$JAR_NAME
 echo ">>> 🚀 애플리케이션 실행: $DEPLOY_JAR" >> $LOG_PATH
