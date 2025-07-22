@@ -3,6 +3,7 @@ package com.efub.mavve.room.service.redis;
 import com.efub.mavve.global.exception.ExceptionCode;
 import com.efub.mavve.global.exception.MavveException;
 import com.efub.mavve.room.payload.summary.CurrentSongSummary;
+import com.efub.mavve.room.payload.summary.SongRedis;
 import com.efub.mavve.room.payload.summary.SongSummary;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -19,10 +21,13 @@ public class RoomSongRedisService {
     private final RedisTemplate<String, Object> objectRedisTemplate;
 
     // 노래 추가
-    public void addSong(Long roomCode, SongSummary song) {
+    public SongRedis addSong(Long roomCode, SongSummary request) {
         try{
             String key = RoomRedisKeyUtils.getSongListKey(roomCode);
+            SongRedis song = SongSummary.toRedisPOJO(request);
             objectRedisTemplate.opsForList().rightPush(key, song); // 리스트 맨 뒤에 추가
+
+            return song;
         } catch (Exception e){
             throw new MavveException(ExceptionCode.REDIS_SAVE_ERROR);
         }
@@ -32,6 +37,9 @@ public class RoomSongRedisService {
     public void addSongs(Long roomCode, List<SongSummary> songList){
         try{
             String key = RoomRedisKeyUtils.getSongListKey(roomCode);
+            List<SongRedis> songs = songList.stream()
+                    .map(SongSummary::toRedisPOJO)
+                    .collect(Collectors.toList());
             objectRedisTemplate.opsForList().rightPush(key, songList.toArray()); // 리스트 맨 뒤에 추가
         } catch (Exception e) {
             throw new MavveException(ExceptionCode.REDIS_SAVE_ERROR);
@@ -39,22 +47,22 @@ public class RoomSongRedisService {
     }
 
     // 처음 노래 조회
-    public SongSummary getFirstSongInRoom(Long roomCode){
+    public SongRedis getFirstSongInRoom(Long roomCode){
         String key = RoomRedisKeyUtils.getSongListKey(roomCode);
-        return (SongSummary) objectRedisTemplate.opsForList().getFirst(key);
+        return (SongRedis) objectRedisTemplate.opsForList().getFirst(key);
     }
 
     // 노래 리스트 전체 조회
-    public List<SongSummary> getAllSongsInRoom(Long roomCode) {
+    public List<SongRedis> getAllSongsInRoom(Long roomCode) {
         String key = RoomRedisKeyUtils.getSongListKey(roomCode);
         List<Object> objectList = objectRedisTemplate.opsForList().range(key, 0, -1);
 
         if(objectList == null) return Collections.emptyList();
 
-        List<SongSummary> result = new ArrayList<>();
+        List<SongRedis> result = new ArrayList<>();
         for (Object item : objectList) {
-            if (item instanceof SongSummary) {
-                result.add((SongSummary) item);
+            if (item instanceof SongRedis) {
+                result.add((SongRedis) item);
             } else {
                 throw new MavveException(ExceptionCode.REDIS_DESERIALIZATION_ERROR);
             }
@@ -66,11 +74,11 @@ public class RoomSongRedisService {
     public void deleteSongs(Long roomCode, List<String> songIdsToRemove) {
         try{
             String key = RoomRedisKeyUtils.getSongListKey(roomCode);
-            List<SongSummary> songsInRoom = getAllSongsInRoom(roomCode);
+            List<SongRedis> songsInRoom = getAllSongsInRoom(roomCode);
 
-            for(SongSummary songSummary: songsInRoom){
-                if(songIdsToRemove.contains(songSummary.getSongId())){
-                    objectRedisTemplate.opsForList().remove(key, 1, songSummary);   //1개 삭제
+            for(SongRedis song : songsInRoom){
+                if(songIdsToRemove.contains(song.getSongId())){
+                    objectRedisTemplate.opsForList().remove(key, 1, song);   //1개 삭제
                 }
             }
         } catch (Exception e){
@@ -79,8 +87,8 @@ public class RoomSongRedisService {
     }
 
     // 다음 노래 찾기
-    public SongSummary getNextSong(Long roomCode, SongSummary currentSong){
-        List<SongSummary> songsInRoom = getAllSongsInRoom(roomCode);
+    public SongRedis getNextSong(Long roomCode, SongRedis currentSong){
+        List<SongRedis> songsInRoom = getAllSongsInRoom(roomCode);
 
         // NOTE: 에러처리가 아니라 song에 null값 담아서 보낼지 추가 고민
         if (songsInRoom.isEmpty()) {
@@ -96,7 +104,7 @@ public class RoomSongRedisService {
     }
 
     // 현재 재생되고 있는 노래 저장 (기존 것 삭제)
-    public void addCurrentSong(Long roomCode, SongSummary song, LocalDateTime startTime){
+    public void addCurrentSong(Long roomCode, SongRedis song, LocalDateTime startTime){
         try{
             String key = RoomRedisKeyUtils.getCurrentSongKey(roomCode);
             objectRedisTemplate.delete(key);    // 이전 노래 map 삭제
@@ -114,10 +122,15 @@ public class RoomSongRedisService {
     // 현재 재생되고 있는 노래 조회
     public CurrentSongSummary getCurrentSong(Long roomCode){
         String key = RoomRedisKeyUtils.getCurrentSongKey(roomCode);
-        SongSummary song = (SongSummary) objectRedisTemplate.opsForHash().get(key, "song");
+        SongRedis song = (SongRedis) objectRedisTemplate.opsForHash().get(key, "song");
         LocalDateTime startTime = (LocalDateTime) objectRedisTemplate.opsForHash().get(key, "startTime");
 
         return CurrentSongSummary.from(song, startTime);
+    }
+
+    // 노래 id용 UUID값 생성
+    public static String createUUID(){
+        return UUID.randomUUID().toString();
     }
 
 }

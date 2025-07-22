@@ -8,7 +8,7 @@ import com.efub.mavve.room.payload.request.DeleteSongRequestPayload;
 import com.efub.mavve.room.payload.response.AddSongResponsePayload;
 import com.efub.mavve.room.payload.response.DeleteSongResponsePayload;
 import com.efub.mavve.room.payload.response.NextSongResponsePayload;
-import com.efub.mavve.room.payload.summary.SongSummary;
+import com.efub.mavve.room.payload.summary.SongRedis;
 import com.efub.mavve.room.service.redis.RoomSongRedisService;
 import com.efub.mavve.room.service.redis.RoomUserRedisService;
 import lombok.RequiredArgsConstructor;
@@ -40,8 +40,8 @@ public class RoomSongWebsocketService {
 
     public AddSongResponsePayload addSong(Long roomCode, AddSongRequestPayload request) {
         //TODO: 노래검색 함수 생성 후 검색한 노래로 수정
-        songRedisService.addSong(roomCode, request.getSong());
-        return AddSongResponsePayload.from(request.getSong());
+        SongRedis songAdd = songRedisService.addSong(roomCode, request.getSong());
+        return AddSongResponsePayload.from(songAdd);
     }
 
     public DeleteSongResponsePayload deleteSongs(Long roomCode, DeleteSongRequestPayload request) {
@@ -50,7 +50,7 @@ public class RoomSongWebsocketService {
     }
 
     // 다음 노래 예약 스케쥴링
-    public void scheduleNextSong(Long roomCode, SongSummary currentSong){
+    public void scheduleNextSong(Long roomCode, SongRedis currentSong){
         LocalDateTime nextSongStartTime = LocalDateTime.now().plusSeconds(currentSong.getDuration());
         Instant scheduleTime = nextSongStartTime
                 .plusSeconds(BROADCAST_DELAY_SECONDS) // 전송 시간 고려해 1초 더 지연
@@ -63,17 +63,18 @@ public class RoomSongWebsocketService {
                 log.info("no user! stop scheduling");
                 return;
             }
-            SongSummary nextSong = songRedisService.getNextSong(roomCode, currentSong);
+            SongRedis nextSong = songRedisService.getNextSong(roomCode, currentSong);
             broadcastNextSong(roomCode, nextSong, nextSongStartTime);
         }, scheduleTime);
         log.info("next song schedule!");
     }
 
     // 다음 노래 전환 브로드캐스트
-    private void broadcastNextSong(Long roomCode, SongSummary nextSong, LocalDateTime startTime){
+    private void broadcastNextSong(Long roomCode, SongRedis nextSong, LocalDateTime startTime){
         songRedisService.addCurrentSong(roomCode, nextSong, startTime);
         log.info("next song!");
         messagingTemplate.convertAndSend("/topic/rooms/" + roomCode + "/songs", NextSongResponsePayload.from(nextSong));
+        scheduleNextSong(roomCode, nextSong);   // 다음 노래 스케쥴링
     }
 
     // 노래 정보 받을 주소 구독 -> 사용자 정보 저장
