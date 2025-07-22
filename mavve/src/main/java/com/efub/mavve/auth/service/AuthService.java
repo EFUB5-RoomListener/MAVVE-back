@@ -45,7 +45,7 @@ public class AuthService {
     public void loginOrRegisterUser(SpotifyCodeRequest request, HttpServletResponse response){
         String code = request.getCode();
         SpotifyUserInfoResponse userInfoResponse = oauthClient.requestOauthInfo(code);
-
+        log.info("code : " + code); 
         if(existedBySpotifyUserId(userInfoResponse.getId())){
             // 존재하는 유저이므로 로그인
             spotifyLogin(userInfoResponse, response);
@@ -104,6 +104,7 @@ public class AuthService {
 
     private void spotifyLogin(SpotifyUserInfoResponse userInfoResponse, HttpServletResponse response){
         String spotifyUserId = userInfoResponse.getId();
+        log.info("userId : " + spotifyUserId);
         User user = userRepository.findBySpotifyUserId(spotifyUserId)
                 .orElseThrow(()-> new MavveException(ExceptionCode.USER_NOT_FOUND));
         log.info("로그인한 유저 : {}", user.getUsername());
@@ -113,6 +114,7 @@ public class AuthService {
 
     private void registerKakaoUser(SpotifyUserInfoResponse userInfoResponse, HttpServletResponse response){
         String username = userInfoResponse.getDisplay_name();
+        log.info("username : " + username);
         String spotifyUserId = userInfoResponse.getId();
         User user = User.fromSpotifyInfo(username, spotifyUserId);
         log.info("회원가입한 유저: {}", username);
