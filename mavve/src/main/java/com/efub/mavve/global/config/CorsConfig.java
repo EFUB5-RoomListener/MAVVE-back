@@ -16,7 +16,7 @@ public class CorsConfig {
         configuration.setAllowedOriginPatterns(List.of("*"));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         configuration.addAllowedHeader("*");
-        configuration.addExposedHeader(HttpHeaders.LOCATION);
+        configuration.addExposedHeader("Location");
         configuration.addExposedHeader("Authorization");
         configuration.setAllowCredentials(true);
 
