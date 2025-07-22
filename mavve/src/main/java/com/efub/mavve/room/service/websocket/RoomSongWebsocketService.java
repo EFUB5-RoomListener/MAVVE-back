@@ -52,15 +52,18 @@ public class RoomSongWebsocketService {
     // 다음 노래 예약 스케쥴링
     public void scheduleNextSong(Long roomCode, SongSummary currentSong){
         LocalDateTime nextSongStartTime = LocalDateTime.now().plusSeconds(currentSong.getDuration());
-        SongSummary nextSong = songRedisService.getNextSong(roomCode, currentSong);
         Instant scheduleTime = nextSongStartTime
                 .plusSeconds(BROADCAST_DELAY_SECONDS) // 전송 시간 고려해 1초 더 지연
                 .atZone(ZoneId.systemDefault())
                 .toInstant();
 
-        //TODO: 다음노래 예약해놓았는데, 해당 노래 삭제한 경우 다음 노래 변환 로직 추가
-        //TODO: 사용자가 있는 지 확인하고 스케쥴링
         taskScheduler.schedule(() -> {
+            // 방에 사용자 있는지 확인하고 스케쥴링
+            if(!userRedisService.hasUsers(roomCode)){
+                log.info("no user! stop scheduling");
+                return;
+            }
+            SongSummary nextSong = songRedisService.getNextSong(roomCode, currentSong);
             broadcastNextSong(roomCode, nextSong, nextSongStartTime);
         }, scheduleTime);
         log.info("next song schedule!");
