@@ -5,7 +5,7 @@ files:
   - source: mavve/src/main/resources/application.yml
     destination: /home/ubuntu/MAVVE-back/mavve/src/main/resources/
     overwrite: yes
-
+  
   - source: build/libs/
     destination: /home/ubuntu/MAVVE-back/build/libs
     overwrite: yes
