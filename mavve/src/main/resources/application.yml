@@ -14,7 +14,8 @@ spring:
         format_sql: true
     hibernate:
       ddl-auto: update
-    generate-ddl: trueshow-sql:true
+    generate-ddl: true
+    show-sql: true
   data:
     redis:
       host: ${REDIS_HOST}
