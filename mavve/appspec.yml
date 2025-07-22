@@ -2,7 +2,7 @@ version: 0.0
 os: linux
 
 files:
-  - source: /build/libs
+  - source: /mavve/build/libs
     destination: /home/ubuntu/MAVVE-back/build/libs
     overwrite: yes
 file_exists_behavior: OVERWRITE

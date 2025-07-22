@@ -11,16 +11,14 @@ import com.efub.mavve.room.dto.response.RoomEnterResponse;
 import com.efub.mavve.room.dto.response.RoomListResponse;
 import com.efub.mavve.room.dto.response.RoomResponse;
 import com.efub.mavve.room.payload.summary.CurrentSongSummary;
-import com.efub.mavve.room.payload.summary.SongSummary;
+import com.efub.mavve.room.payload.summary.SongRedis;
 import com.efub.mavve.room.repository.RoomRepository;
 import com.efub.mavve.room.service.redis.RoomSongRedisService;
 import com.efub.mavve.room.service.redis.RoomUserRedisService;
 import com.efub.mavve.room.service.websocket.RoomSongWebsocketService;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import com.efub.mavve.room.repository.RoomLikeRepository;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -153,7 +151,7 @@ public class RoomService {
     @Transactional(readOnly = true)
     public RoomEnterResponse getRoomEnterInfo(Long roomId) {
         Room room = findByRoomId(roomId);
-        List<SongSummary> songList = roomSongRedisService.getAllSongsInRoom(roomId);
+        List<SongRedis> songList = roomSongRedisService.getAllSongsInRoom(roomId);
         log.info("song count : {}", songList.size());
         String duration = getTotalDurationTime(songList);
 
@@ -162,9 +160,9 @@ public class RoomService {
     }
 
     // 첫 입장자인 경우 처리
-    private CurrentSongSummary handleFirstEnter(Long roomId, List<SongSummary> songList) {
+    private CurrentSongSummary handleFirstEnter(Long roomId, List<SongRedis> songList) {
         if (!roomUserRedisService.hasUsers(roomId)) {
-            SongSummary firstSong = roomSongRedisService.getFirstSongInRoom(roomId);
+            SongRedis firstSong = roomSongRedisService.getFirstSongInRoom(roomId);
             if (firstSong != null) {
                 log.info("first user!!");
                 LocalDateTime startTime = LocalDateTime.now();
@@ -181,9 +179,9 @@ public class RoomService {
     }
 
     // 노래 총 재생시간 String으로 변환
-    private String getTotalDurationTime(List<SongSummary> songs){
+    private String getTotalDurationTime(List<SongRedis> songs){
         int totalSeconds = songs.stream()
-                .mapToInt(SongSummary::getDuration)
+                .mapToInt(SongRedis::getDuration)
                 .sum();
 
         int hours = totalSeconds / 3600;
