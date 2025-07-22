@@ -4,10 +4,8 @@ import com.efub.mavve.auth.domain.User;
 import com.efub.mavve.playlist.dto.summary.PlaylistSummary;
 import com.efub.mavve.room.dto.request.RoomCreateRequest;
 import com.efub.mavve.room.dto.request.RoomUpdateRequest;
-import com.efub.mavve.room.dto.response.RoomEnterResponse;
-import com.efub.mavve.room.dto.response.RoomLikeResponse;
-import com.efub.mavve.room.dto.response.RoomListResponse;
-import com.efub.mavve.room.dto.response.RoomResponse;
+import com.efub.mavve.room.dto.response.*;
+import com.efub.mavve.room.service.RoomChatService;
 import com.efub.mavve.room.service.RoomLikeService;
 import com.efub.mavve.room.service.RoomPlaylistService;
 import com.efub.mavve.room.service.RoomService;
@@ -26,6 +24,7 @@ import java.util.List;
 public class RoomController {
     private final RoomService roomService;
     private final RoomLikeService roomLikeService;
+    private final RoomChatService roomChatService;
     private final RoomPlaylistService roomPlaylistService;
 
     // 방 생성
@@ -102,6 +101,14 @@ public class RoomController {
     @GetMapping("/{roomId}/enter")
     public ResponseEntity<RoomEnterResponse> getRoomEnterInfo(@PathVariable("roomId") Long roomId){
         RoomEnterResponse response = roomService.getRoomEnterInfo(roomId);
+        return ResponseEntity.ok(response);
+    }
+
+    // 채팅 전체 조회(페이징)
+    @GetMapping("/{roomId}/chats")
+    public ResponseEntity<ChatListResponse> getAllChats(@PathVariable("roomId") Long roomId,
+                                                        @RequestParam(value = "lastChatId", required = false) Long lastChatId){
+        ChatListResponse response = roomChatService.getAllChats(roomId, lastChatId);
         return ResponseEntity.ok(response);
     }
 
