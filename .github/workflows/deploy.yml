@@ -31,14 +31,14 @@ jobs:
 
       - name: make application.yml
         run: |
-          mkdir ./mavve/src/main/resources
+          mkdir -p ./mavve/src/main/resources
           cd ./mavve/src/main/resources
           touch ./application.yml
           echo "${{ secrets.APPLICATION_YML }}" > ./application.yml
 
       - name: Build with Gradle
         run: |
-          cd blog
+          cd mavve
           chmod +x ./gradlew
           ./gradlew build -x test
 
