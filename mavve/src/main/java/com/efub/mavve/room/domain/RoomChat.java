@@ -23,11 +23,11 @@ public class RoomChat {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long roomChatId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "userId", nullable = false)
     private User user;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "roomId", nullable = false)
     private Room room;
 
