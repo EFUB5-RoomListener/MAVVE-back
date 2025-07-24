@@ -39,7 +39,6 @@ public class RoomSongWebsocketService {
     private static final int BROADCAST_DELAY_SECONDS = 1;
 
     public AddSongResponsePayload addSong(Long roomCode, AddSongRequestPayload request) {
-        //TODO: 노래검색 함수 생성 후 검색한 노래로 수정
         SongRedis songAdd = songRedisService.addSong(roomCode, request.getSong());
         return AddSongResponsePayload.from(songAdd);
     }

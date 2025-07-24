@@ -9,8 +9,11 @@ import com.efub.mavve.room.domain.Room;
 import com.efub.mavve.room.domain.RoomPlaylist;
 import com.efub.mavve.room.dto.response.RoomListResponse;
 import com.efub.mavve.room.dto.response.RoomResponse;
+import com.efub.mavve.room.payload.summary.SongRedis;
 import com.efub.mavve.room.repository.RoomPlaylistRepository;
 import com.efub.mavve.room.repository.RoomRepository;
+import com.efub.mavve.room.service.redis.RoomSongRedisService;
+import com.efub.mavve.songs.domain.Song;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,6 +29,7 @@ public class RoomPlaylistService {
     private final PlaylistRepository playlistRepository;
     private final RoomRepository roomRepository;
     private final RoomPlaylistRepository roomPlaylistRepository;
+    private final RoomSongRedisService roomSongRedisService;
 
     // 방에 플레이리스트 추가
     @Transactional
@@ -71,5 +75,13 @@ public class RoomPlaylistService {
     public Playlist findByPlaylistId(Long playlistId){
         return playlistRepository.findById(playlistId)
                 .orElseThrow(() -> new MavveException(ExceptionCode.PLAYLIST_NOT_FOUND));
+    }
+
+    // 방 새로 생성 시 playlist 내의 노래 목록 redis에 저장
+    @Transactional(readOnly = true)
+    public void addSongsByPlaylist(Long roomCode){
+        List<Song> songRaws = roomPlaylistRepository.findSongsByRoomId(roomCode);
+        List<SongRedis> songs = songRaws.stream().map(SongRedis::EntityToRedisPOJO).collect(Collectors.toList());
+        roomSongRedisService.addSongs(roomCode, songs);
     }
 }

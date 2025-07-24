@@ -34,6 +34,7 @@ public class RoomService {
     private final RoomSongRedisService roomSongRedisService;
     private final RoomUserRedisService roomUserRedisService;
     private final RoomSongWebsocketService roomSongWebsocketService;
+    private final RoomPlaylistService roomPlaylistService;
     private final RoomLikeRepository roomLikeRepository;
 
     // 방 생성
@@ -151,17 +152,23 @@ public class RoomService {
     @Transactional(readOnly = true)
     public RoomEnterResponse getRoomEnterInfo(Long roomId) {
         Room room = findByRoomId(roomId);
+        CurrentSongSummary currentSong = handleFirstEnter(roomId);
+
         List<SongRedis> songList = roomSongRedisService.getAllSongsInRoom(roomId);
         log.info("song count : {}", songList.size());
         String duration = getTotalDurationTime(songList);
-
-        CurrentSongSummary currentSong = handleFirstEnter(roomId, songList);
         return RoomEnterResponse.from(room, songList, duration, currentSong);
     }
 
     // 첫 입장자인 경우 처리
-    private CurrentSongSummary handleFirstEnter(Long roomId, List<SongRedis> songList) {
+    private CurrentSongSummary handleFirstEnter(Long roomId) {
         if (!roomUserRedisService.hasUsers(roomId)) {
+            // 방 생성된 뒤 플레이리스트의 노래들 redis에 저장
+            if(!roomSongRedisService.hasSongs(roomId)){
+                roomPlaylistService.addSongsByPlaylist(roomId);
+            }
+
+            // 첫 번째 노래 재생 시작
             SongRedis firstSong = roomSongRedisService.getFirstSongInRoom(roomId);
             if (firstSong != null) {
                 log.info("first user!!");
