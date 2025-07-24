@@ -93,6 +93,19 @@ public class RoomService {
         return RoomListResponse.from(responseList);
     }
 
+    // 내가 좋아요 누른 방 조회
+    @Transactional(readOnly = true)
+    public RoomListResponse getUserLikeListRoom(User user){
+        List<Room> roomList = roomLikeRepository.findRoomByUser(user);
+
+        List<RoomResponse> responseList = roomList.stream()
+                .map(room -> {
+                    int likeCount = roomLikeRepository.countByRoom(room);
+                    return RoomResponse.from(room, likeCount);})
+                .collect(Collectors.toList());
+        return RoomListResponse.from(responseList);
+    }
+
     // 조회순으로 공개된 방 리스트 Top5 조회
     @Transactional(readOnly = true)
     public RoomListResponse getHotListRoom(){
