@@ -187,10 +187,11 @@ public class RoomService {
 
     // 노래 총 재생시간 String으로 변환
     private String getTotalDurationTime(List<SongRedis> songs){
-        int totalSeconds = songs.stream()
+        int totalMillis = songs.stream()
                 .mapToInt(SongRedis::getDuration)
                 .sum();
-
+        int totalSeconds = totalMillis / 1000;
+        
         int hours = totalSeconds / 3600;
         int minutes = (totalSeconds % 3600) / 60;
         int seconds = totalSeconds % 60;

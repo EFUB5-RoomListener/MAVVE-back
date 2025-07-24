@@ -21,6 +21,7 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.stereotype.Service;
 
 import java.security.Principal;
+import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -50,9 +51,10 @@ public class RoomSongWebsocketService {
 
     // 다음 노래 예약 스케쥴링
     public void scheduleNextSong(Long roomCode, SongRedis currentSong){
-        LocalDateTime nextSongStartTime = LocalDateTime.now().plusSeconds(currentSong.getDuration());
+        LocalDateTime nextSongStartTime = LocalDateTime.now()
+                .plus(Duration.ofMillis(currentSong.getDuration()))
+                .plusSeconds(BROADCAST_DELAY_SECONDS); // 전송 시간 고려해 1초 더 지연
         Instant scheduleTime = nextSongStartTime
-                .plusSeconds(BROADCAST_DELAY_SECONDS) // 전송 시간 고려해 1초 더 지연
                 .atZone(ZoneId.systemDefault())
                 .toInstant();
 
