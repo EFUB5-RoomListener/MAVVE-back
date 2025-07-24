@@ -12,7 +12,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -34,13 +33,12 @@ public class RoomSongRedisService {
     }
 
     // 노래 리스트 추가
-    public void addSongs(Long roomCode, List<SongSummary> songList){
-        try{
+    public void addSongs(Long roomCode, List<SongRedis> songList){
+        try {
             String key = RoomRedisKeyUtils.getSongListKey(roomCode);
-            List<SongRedis> songs = songList.stream()
-                    .map(SongSummary::toRedisPOJO)
-                    .collect(Collectors.toList());
-            objectRedisTemplate.opsForList().rightPush(key, songList.toArray()); // 리스트 맨 뒤에 추가
+            for (SongRedis song : songList) {
+                objectRedisTemplate.opsForList().rightPush(key, song);
+            }
         } catch (Exception e) {
             throw new MavveException(ExceptionCode.REDIS_SAVE_ERROR);
         }
@@ -126,6 +124,15 @@ public class RoomSongRedisService {
         LocalDateTime startTime = (LocalDateTime) objectRedisTemplate.opsForHash().get(key, "startTime");
 
         return CurrentSongSummary.from(song, startTime);
+    }
+    
+    // 현재 노래 리스트 있는지 확인
+    public boolean hasSongs(Long roomCode){
+        String key = RoomRedisKeyUtils.getSongListKey(roomCode);
+        Long songCount = objectRedisTemplate.opsForList().size(key);
+        log.info("no song in redis");
+
+        return !(songCount == 0 || songCount == null);
     }
 
     // 노래 id용 UUID값 생성
