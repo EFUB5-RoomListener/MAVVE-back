@@ -13,7 +13,6 @@ import java.util.List;
 @Getter
 @AllArgsConstructor
 public class RoomResponse {
-    private final RoomLikeRepository roomLikeRepository;
 
     private Long roomId;
     private Long userId;
@@ -21,6 +20,7 @@ public class RoomResponse {
     private Long viewCount;
     private int likeCount;
     private List<String> tag;
+    private String imageURL;
     private boolean isPublic;
     private LocalDateTime createdAt;
 
@@ -33,6 +33,7 @@ public class RoomResponse {
                 .viewCount(room.getViewCount())
                 .likeCount(likeCount)
                 .tag(room.getTag())
+                .imageURL(room.getImageURL())
                 .isPublic(room.isPublic())
                 .createdAt(room.getCreatedAt())
                 .build();

@@ -8,6 +8,7 @@ import java.util.List;
 
 public record RoomCreateRequest(@NotNull String roomName,
                                 List<String> tag,
+                                String imageURL,
                                 @NotNull boolean isPublic
                                 ) {
     public Room toEntity(User user){
@@ -15,6 +16,7 @@ public record RoomCreateRequest(@NotNull String roomName,
                 .user(user)
                 .roomName(roomName())
                 .tag(tag())
+                .imageURL(imageURL())
                 .isPublic(isPublic())
                 .build();
     }
