@@ -19,6 +19,7 @@ public class DiaryResponse {
     private String songTitle;
     private List<String> songArtist;
     private String songImageUrl;
+    private String songDuration;
     private LocalDateTime createdAt;
 
     public static DiaryResponse from(Diary diary, List<String> artist){
@@ -30,7 +31,18 @@ public class DiaryResponse {
                 .songTitle(diary.getSong().getTitle())
                 .songArtist(artist)
                 .songImageUrl(diary.getSong().getCoverImageUrl())
+                .songDuration(convertDuration(diary.getSong().getDuration()))
                 .createdAt(diary.getCreatedAt())
                 .build();
     }
+
+    // duration 변환
+    private static String convertDuration(int duration) {
+        int totalSeconds = duration/1000;
+        int minutes = totalSeconds/60;
+        int seconds = totalSeconds%60;
+        return String.format("%02d:%02d", minutes, seconds);
+    }
 }
+
+
