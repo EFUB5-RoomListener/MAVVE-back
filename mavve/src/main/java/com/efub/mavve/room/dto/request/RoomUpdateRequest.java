@@ -8,5 +8,6 @@ import java.util.List;
 
 public record RoomUpdateRequest (String roomName,
                                 List<String> tag,
+                                String imageURL,
                                 boolean isPublic){
 }

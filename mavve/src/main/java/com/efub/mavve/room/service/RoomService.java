@@ -52,6 +52,7 @@ public class RoomService {
 
         if(request.roomName()!=null){room.changeRoomName(request.roomName());}
         if(request.tag()!=null){room.changeTag(request.tag());}
+        if(request.imageURL()!=null){room.changeImageURL(request.imageURL());}
         room.changeIsPublic(request.isPublic());
         int likeCount = roomLikeRepository.countByRoom(room);
 

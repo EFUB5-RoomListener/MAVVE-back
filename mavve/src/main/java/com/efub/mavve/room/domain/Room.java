@@ -39,17 +39,21 @@ public class Room {
     @Column(nullable = false)
     private boolean isPublic;
 
+    @Column
+    private String imageURL;
+
     @CreatedDate
     private LocalDateTime createdAt;
 
 
     // 빌더
     @Builder
-    public Room(User user, String roomName, List<String> tag, boolean isPublic) {
+    public Room(User user, String roomName, List<String> tag, boolean isPublic, String imageURL) {
         this.user = user;
         this.roomName = roomName;
         this.tag = tag;
         this.viewCount = 0L;
+        this.imageURL = imageURL;
         this.isPublic = isPublic;
     }
 
@@ -67,4 +71,7 @@ public class Room {
     public void changeIsPublic(boolean isPublic){
         this.isPublic = isPublic;
     }
+
+    // 방 이미지 변경
+    public void changeImageURL(String imageURL) {this.imageURL = imageURL;}
 }
