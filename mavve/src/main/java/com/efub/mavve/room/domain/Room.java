@@ -1,6 +1,7 @@
 package com.efub.mavve.room.domain;
 
 import com.efub.mavve.auth.domain.User;
+import com.efub.mavve.global.convertor.StringListConverter;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
@@ -33,7 +34,8 @@ public class Room {
     @Column(nullable = false)
     private Long viewCount;
 
-    @Column
+    @Column(columnDefinition = "TEXT")
+    @Convert(converter = StringListConverter.class)
     private List<String> tag;
 
     @Column(nullable = false)
