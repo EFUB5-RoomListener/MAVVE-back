@@ -44,3 +44,5 @@ public class DiaryResponse {
         return String.format("%02d:%02d", minutes, seconds);
     }
 }
+
+
