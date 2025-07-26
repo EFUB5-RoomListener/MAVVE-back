@@ -42,12 +42,13 @@ cloud:
 spotify:
   client-id: ${CLIENT_ID}
   client-secret: ${CLIENT_SECRET}
-  redirect-uri: http://127.0.0.1:8080/login/oauth2/code/spotify
+  redirect-uri: http://127.0.0.1:5173/login/load
   auth-uri: https://accounts.spotify.com/authorize
   token-uri: https://accounts.spotify.com/api/token
   user-info-uri: https://api.spotify.com/v1/me
   search-uri: https://api.spotify.com/v1/search
   get-track-uri: https://api.spotify.com/v1/tracks
+  reissue-uri: https://accounts.spotify.com/api/token
 server:
   tomcat:
     uri-encoding: UTF-8

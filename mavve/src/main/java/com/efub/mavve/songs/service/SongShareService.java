@@ -51,7 +51,8 @@ public class SongShareService {
     public Song saveSongBySpotifySongId(String spotifySongId, User user) {
         String userId = user.getUserId().toString();
         String accessToken = spotifyTokenService.getAccessToken(userId);
-        SongInfoResponse songInfoResponse = spotifyClient.getSongInfo(spotifySongId, accessToken);
+        String refreshToken = spotifyTokenService.getRefreshToken(userId);
+        SongInfoResponse songInfoResponse = spotifyClient.getSongInfo(spotifySongId, accessToken, refreshToken, userId);
         Song newSong = Song.fromSongInfoResponse(songInfoResponse);
         saveSong(newSong);
         List<Artist> artists = artistService.findOrCreateArtists(songInfoResponse.getArtists());

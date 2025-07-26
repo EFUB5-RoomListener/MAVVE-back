@@ -32,13 +32,13 @@ public class SongService {
         Long userId = user.getUserId();
         log.info("userId - {} is searching : {}", userId, query);
 
-        // TODO: 스포티파이의 리프레시 토큰에 대한 리이슈 적용 필요 (현재는 1시간 후면 종료)
 
         // 스포티파이 액세스 토큰을 redis에서 가져옴
         String accessToken = spotifyTokenService.getAccessToken(userId.toString());
+        String refreshToken = spotifyTokenService.getRefreshToken(userId.toString());
 
         // 스포티파이 api를 통해 노래 검색
-        SearchSongResponse searchSongResponse =  spotifyClient.getSongSearchResult(query, accessToken, size, page);
+        SearchSongResponse searchSongResponse =  spotifyClient.getSongSearchResult(query, refreshToken, accessToken, size, page, userId.toString());
 
         // 응답 DTO로 변환
         int totalElements = searchSongResponse.getTracks().getTotal();

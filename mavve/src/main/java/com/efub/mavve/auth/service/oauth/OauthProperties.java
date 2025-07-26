@@ -17,6 +17,8 @@ public class OauthProperties {
     private final String tokenRequestUri;
     @Getter
     private final String userInfoUri;
+    @Getter
+    private final String reissueUri;
     private final String redirectUri;
     private final String authorizeUri;
     private final String clientId;
@@ -28,13 +30,15 @@ public class OauthProperties {
             @Value("${spotify.client-id}") String clientId,
             @Value("${spotify.redirect-uri}") String redirectUri,
             @Value("${spotify.auth-uri}") String authorizeUri,
-            @Value("${spotify.client-secret}") String clientSecret) {
+            @Value("${spotify.client-secret}") String clientSecret,
+            @Value("${spotify.reissue-uri}") String reissueUri) {
         this.tokenRequestUri = tokenRequestUri;
         this.userInfoUri = userInfoUri;
         this.clientId = clientId;
         this.redirectUri = redirectUri;
         this.authorizeUri = authorizeUri;
         this.clientSecret = clientSecret;
+        this.reissueUri = reissueUri;
     }
 
     public String redirectToSpotify() {
