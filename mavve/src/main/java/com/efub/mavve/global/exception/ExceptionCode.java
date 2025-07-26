@@ -55,7 +55,10 @@ public enum ExceptionCode {
     NO_SESSION_ID(HttpStatus.INTERNAL_SERVER_ERROR, ClientExceptionCode.NO_SESSION_ID, "웹소켓 subscribe 요청에 sessionId가 없음."),
 
     // 한 줄 일기
-    DIARY_NOT_FOUND(HttpStatus.NOT_FOUND, ClientExceptionCode.DIARY_NOT_FOUND, "해당되는 일기가 존재하지 않습니다.");
+    DIARY_NOT_FOUND(HttpStatus.NOT_FOUND, ClientExceptionCode.DIARY_NOT_FOUND, "해당되는 일기가 존재하지 않습니다."),
+
+    // 스포티파이 리이슈
+    SPOTIFY_REISSUE_ERROR(HttpStatus.UNAUTHORIZED, ClientExceptionCode.SPOTIFY_REISSUE_ERROR, "스포티파이 토큰 리이슈에 실패했습니다.");
 
     private final HttpStatus httpStatus;
     private final ClientExceptionCode clientExceptionCode;

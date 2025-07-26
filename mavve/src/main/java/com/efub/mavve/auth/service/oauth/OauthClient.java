@@ -43,4 +43,16 @@ public class OauthClient {
     public String getRedirectUri(){
         return oauthProperties.redirectToSpotify();
     }
+
+    public SpotifyReissueResponse getReissueResponse(String refreshToken){
+        String reissueRequestUri = oauthProperties.getReissueUri();
+        MultiValueMap<String, String> reissueRequestBody = oauthProperties.createReissueRequestBodyInSpotify(refreshToken);
+            SpotifyReissueResponse s = restClient.post()
+                    .uri(reissueRequestUri)
+                    .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                    .body(reissueRequestBody)
+                    .retrieve()
+                    .body(SpotifyReissueResponse.class);
+            return s;
+     }
 }
