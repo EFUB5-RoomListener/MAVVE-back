@@ -3,6 +3,7 @@ package com.efub.mavve.auth.service;
 import com.efub.mavve.auth.domain.User;
 import com.efub.mavve.auth.dto.request.SpotifyCodeRequest;
 import com.efub.mavve.auth.dto.request.UserInfoRequest;
+import com.efub.mavve.auth.dto.response.SpotifyAccessTokenResponse;
 import com.efub.mavve.auth.dto.response.SpotifyRedirctUri;
 import com.efub.mavve.auth.dto.response.SpotifyUserInfoResponse;
 import com.efub.mavve.auth.dto.response.UserInfoResponse;
@@ -99,6 +100,21 @@ public class AuthService {
 
         // accessToken과 refreshToken 재 발급
         sendTokens(user, response);
+    }
+
+    @Transactional
+    public SpotifyAccessTokenResponse getSpotifyAccessToken(User user) {
+        String userId = user.getUserId().toString();
+        String spotifyAccessToken = spotifyTokenService.getAccessToken(userId);
+        Long ttl = spotifyTokenService.getTtl(userId);
+
+        if(spotifyAccessToken == null || ttl == null || ttl < 60){
+            String refreshToken = spotifyTokenService.getRefreshToken(userId);
+            spotifyAccessToken = oauthClient.getReissueResponse(refreshToken).getAccess_token();
+            spotifyTokenService.saveAccessToken(userId, spotifyAccessToken);
+        }
+
+        return SpotifyAccessTokenResponse.builder().spotifyAccessToken(spotifyAccessToken).build();
     }
 
 

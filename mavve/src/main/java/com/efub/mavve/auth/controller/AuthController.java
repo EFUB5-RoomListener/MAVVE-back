@@ -3,6 +3,7 @@ package com.efub.mavve.auth.controller;
 import com.efub.mavve.auth.domain.User;
 import com.efub.mavve.auth.dto.request.SpotifyCodeRequest;
 import com.efub.mavve.auth.dto.request.UserInfoRequest;
+import com.efub.mavve.auth.dto.response.SpotifyAccessTokenResponse;
 import com.efub.mavve.auth.dto.response.SpotifyRedirctUri;
 import com.efub.mavve.auth.dto.response.UserInfoResponse;
 import com.efub.mavve.auth.service.AuthService;
@@ -55,5 +56,10 @@ public class AuthController {
     public ResponseEntity<UserInfoResponse> updateUserInfo(@AuthenticationPrincipal User user,
                                                            @Valid @RequestBody UserInfoRequest userInfoRequest){
         return ResponseEntity.ok(authService.updateUserInfo(user, userInfoRequest));
+    }
+
+    @GetMapping("/spotify-token")
+    public ResponseEntity<SpotifyAccessTokenResponse> getSpotifyAccessToken(@AuthenticationPrincipal User user){
+        return ResponseEntity.ok(authService.getSpotifyAccessToken(user));
     }
 }
