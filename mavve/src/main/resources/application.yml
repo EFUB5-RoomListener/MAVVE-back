@@ -48,6 +48,7 @@ spotify:
   user-info-uri: https://api.spotify.com/v1/me
   search-uri: https://api.spotify.com/v1/search
   get-track-uri: https://api.spotify.com/v1/tracks
+  reissue-uri: https://accounts.spotify.com/api/token
 server:
   tomcat:
     uri-encoding: UTF-8
