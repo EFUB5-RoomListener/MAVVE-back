@@ -20,6 +20,7 @@ public class DiaryResponse {
     private List<String> songArtist;
     private String songImageUrl;
     private String songDuration;
+    private String album;
     private LocalDateTime createdAt;
 
     public static DiaryResponse from(Diary diary, List<String> artist){
@@ -32,6 +33,7 @@ public class DiaryResponse {
                 .songArtist(artist)
                 .songImageUrl(diary.getSong().getCoverImageUrl())
                 .songDuration(convertDuration(diary.getSong().getDuration()))
+                .album(diary.getSong().getAlbum())
                 .createdAt(diary.getCreatedAt())
                 .build();
     }
