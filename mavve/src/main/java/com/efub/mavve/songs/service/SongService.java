@@ -4,6 +4,7 @@ import com.efub.mavve.auth.domain.User;
 import com.efub.mavve.auth.service.jwt.SpotifyTokenService;
 import com.efub.mavve.global.exception.ExceptionCode;
 import com.efub.mavve.global.exception.MavveException;
+import com.efub.mavve.songs.dto.response.spotify.PlaylistItemResponse;
 import com.efub.mavve.songs.dto.response.spotify.SearchSongResponse;
 import com.efub.mavve.songs.dto.response.SongResponse;
 import com.efub.mavve.songs.dto.response.TotalSongsResponse;
@@ -38,7 +39,14 @@ public class SongService {
         String refreshToken = spotifyTokenService.getRefreshToken(userId.toString());
 
         // 스포티파이 api를 통해 노래 검색
-        SearchSongResponse searchSongResponse =  spotifyClient.getSongSearchResult(query, refreshToken, accessToken, size, page, userId.toString());
+        SearchSongResponse searchSongResponse;
+        if(query == null || query.isEmpty()) {
+            PlaylistItemResponse playlistItemResponse = spotifyClient.getSongInPlaylist(refreshToken, accessToken, size, page, userId.toString());
+            searchSongResponse = PlaylistItemResponse.toSearchSongResponse(playlistItemResponse);
+        } else {
+            searchSongResponse =  spotifyClient.getSongSearchResult(query, refreshToken, accessToken, size, page, userId.toString());
+            System.out.println(searchSongResponse.getTracks().getItems().get(0).getName());
+        }
 
         // 응답 DTO로 변환
         int totalElements = searchSongResponse.getTracks().getTotal();

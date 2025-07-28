@@ -4,6 +4,7 @@ import com.efub.mavve.auth.service.jwt.SpotifyTokenService;
 import com.efub.mavve.auth.service.oauth.OauthClient;
 import com.efub.mavve.global.exception.ExceptionCode;
 import com.efub.mavve.global.exception.MavveException;
+import com.efub.mavve.songs.dto.response.spotify.PlaylistItemResponse;
 import com.efub.mavve.songs.dto.response.spotify.SearchSongResponse;
 import com.efub.mavve.songs.dto.response.spotify.SongInfoResponse;
 import lombok.RequiredArgsConstructor;
@@ -52,6 +53,16 @@ public class SpotifyClient {
 
     }
 
+    public PlaylistItemResponse getSongInPlaylist(String refreshToken, String accessToken, int limit, int offset, String userId){
+        return executeWithRetry((token) -> {
+            String songInPlaylistRequestUri = spotifyProperties.getSongInPlaylistRequestUri(limit, offset);
+            return restClient.get()
+                    .uri(songInPlaylistRequestUri)
+                    .header(headerName, headerValue + token)
+                    .retrieve()
+                    .body(PlaylistItemResponse.class);
+        }, refreshToken, accessToken, userId, false);
+    }
 
     private <T> T executeWithRetry(Function<String, T> requestFunction, String refreshToken, String accessToken, String userId, boolean hasRetried) {
         try {
