@@ -16,7 +16,7 @@ public class SongController {
 
     @GetMapping("/search")
     public ResponseEntity<TotalSongsResponse> getSongSearchResult(@AuthenticationPrincipal User user,
-            @RequestParam String query, @RequestParam int page, @RequestParam int size) {
+            @RequestParam(required = false) String query, @RequestParam int page, @RequestParam int size) {
         return ResponseEntity.ok(songService.getSongSearchResults(user, query, page, size));
     }
 

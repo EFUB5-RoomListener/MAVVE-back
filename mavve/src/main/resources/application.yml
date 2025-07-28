@@ -49,6 +49,8 @@ spotify:
   search-uri: https://api.spotify.com/v1/search
   get-track-uri: https://api.spotify.com/v1/tracks
   reissue-uri: https://accounts.spotify.com/api/token
+  playlist-id: 7qaj9zCKCQVMnxEkzWi2Sx
+  get-track-in-playlist-uri: https://api.spotify.com/v1/playlists
 server:
   tomcat:
     uri-encoding: UTF-8
