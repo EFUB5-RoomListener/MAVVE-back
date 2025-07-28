@@ -28,7 +28,7 @@ public class RoomChatService {
     private final RoomService roomService;
     private final PrincipalUtil principalUtil;
 
-    private final static int CHATLIST_SIZE = 2; // 채팅 한 번에 보여줄 수. 추후 조정 예정
+    private final static int CHATLIST_SIZE = 15; // 채팅 한 번에 보여줄 수.
 
     @Transactional
     public ChatResponsePayload createAndSendMessage(Long roomCode, ChatRequestPayload request, Principal principal) {
