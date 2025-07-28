@@ -25,7 +25,7 @@ public class SpotifyClient {
     private final OauthClient oauthClient;
     private final SpotifyTokenService spotifyTokenService;
 
-    public SearchSongResponse getSongSearchResult(String query, String refreshToken, String accessToken, int limit, int offset, String userId) {
+    public SearchSongResponse getSongSearchResult(String query, String accessToken, String refreshToken, int limit, int offset, String userId) {
         return executeWithRetry((token) -> {
             String searchRequestUri = spotifyProperties.getSerchSongRequestUri(query, limit, offset);
             return restClient.get()
