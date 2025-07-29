@@ -23,15 +23,17 @@ public class RoomResponse {
     private String imageURL;
     private boolean isPublic;
     private LocalDateTime createdAt;
+    private boolean liked;
 
 
-    public static RoomResponse from(Room room, int likeCount){
+    public static RoomResponse from(Room room, int likeCount, boolean liked){
         return RoomResponse.builder()
                 .roomId(room.getRoomId())
                 .userId(room.getUser().getUserId())
                 .roomName(room.getRoomName())
                 .viewCount(room.getViewCount())
                 .likeCount(likeCount)
+                .liked(liked)
                 .tag(room.getTag())
                 .imageURL(room.getImageURL())
                 .isPublic(room.isPublic())
