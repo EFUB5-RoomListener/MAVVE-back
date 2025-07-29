@@ -1,52 +1,139 @@
-## MAVVE-Backend
-<img width="1920" alt="mainpage" src="https://github.com/user-attachments/assets/b2f8ae50-2890-42df-b2bc-f92c70d104bb" />
 
-## 📌 Commit Convention
-* {Tag}: 작업 내용 #이슈번호
+<div align="center">
+  <h1>🌊MAVVE - Backend</h1>
+  <p>EFUB 5기 SWS 3팀 "Mavve" 프로젝트 백엔드 레포지토리입니다.</p>
+  <img width="600" alt="mavve-preview" src="https://github.com/user-attachments/assets/65266682-ae49-447b-af9d-8c872395382a" />
+  <a href="https://api.mavve.p-e.kr"><img src="https://img.shields.io/badge/Mavve%20BE%20Server-1C9AD6?style=flat-square&logoColor=white&link=https://api.mavve.p-e.kr"/></a>
+</div>
 
-| 태그         | 설명                          |
-| ---------- | --------------------------- |
-| `feat`     | 새로운 기능 추가                   |
-| `fix`      | 버그 수정                       |
-| `docs`     | 문서 수정 (README 등)            |
-| `style`    | 코드 포맷, 세미콜론 등 변경 (기능 변경 없음) |
-| `refactor` | 리팩토링 (기능 변경 없음)             |
-| `test`     | 테스트 코드 추가/수정                |
-| `chore`    | 빌드 설정, 패키지 설치 등 기타 잡일       |
-| `perf`     | 성능 개선                       |
-| `hotfix`   | 급한 버그 수정                    |
+## 🎸Mavve는 어떤 프로젝트일까요?
 
-### 👩‍💻 예시
+> 음악을 통한 공유 경험, Mavve!
+
+`Mavve`는 음악을 통해 감정을 실시간으로 공유하고,  
+몰입감을 높이는 협업 환경을 제공하는 서비스입니다.  
+음악 플레이리스트, 한줄 일기를 기반으로 다른 유저와 교감할 수 있어요.
+
+## 🗓️ 개발 기간
+- 2025.07.07 ~
+
+## 💡 주요 기능
+
+## 🔧 아키텍처
+<img width="1920" height="1080" alt="mavve_sys_ar" src="https://github.com/user-attachments/assets/72491954-426b-4e71-9378-7c151f831eaf" />
+
+## 🔨 기술 스택
+**Develop**
+
+<img src="https://img.shields.io/badge/springboot-6DB33F?style=for-the-badge&logo=springboot&logoColor=white"> <img src="https://img.shields.io/badge/Spring Security-6DB33F?style=for-the-badge&logo=springsecurity&logoColor=white"> <img src="https://img.shields.io/badge/MYSQL-4479A1?style=for-the-badge&logo=mysql&logoColor=white"> <img src="https://img.shields.io/badge/gradle-02303A?style=for-the-badge&logo=gradle&logoColor=white"> <img src="https://img.shields.io/badge/JWT-black?style=for-the-badge&logo=JSON%20web%20tokens"> <img src="https://img.shields.io/badge/REDIS-FF4438?style=for-the-badge&logo=redis&logoColor=white"> <img src="https://img.shields.io/badge/Spotify%20Web%20API-1ED760?style=for-the-badge&logo=spotify&logoColor=white">
+
+**Deploy**
+
+<img src="https://img.shields.io/badge/AWS EC2-FF9900?style=for-the-badge&logo=amazonec2&logoColor=white"> <img src="https://img.shields.io/badge/AWS RDS-527FFF?style=for-the-badge&logo=amazonrds&logoColor=white"> ![Nginx](https://img.shields.io/badge/nginx-%23009639.svg?style=for-the-badge&logo=nginx&logoColor=white) <img src="https://img.shields.io/badge/github%20actions-181717?style=for-the-badge&logo=github%20actions&logoColor=white">
+
+## 🖥️ ERD
+<img width="1740" height="1432" alt="mavve (1)" src="https://github.com/user-attachments/assets/16780a7e-518b-4d5f-891a-1875cb9374fb" />
+
+## 👩‍💻 팀원
+<table>
+  <tr>
+    <td align="center"><img src="https://github.com/9rin.png" width="100" /></td>
+    <td align="center"><img src="https://github.com/jettieb.png" width="100" /></td>
+    <td align="center"><img src="https://github.com/yepot.png" width="100" /></td>
+    <td align="center"><img src="https://github.com/topograp2.png" width="100" /></td>
+  </tr>
+  <tr>
+    <td align="center"><a href="https://github.com/9rin"><strong>@9rin</strong></a></td>
+    <td align="center"><a href="https://github.com/jettieb"><strong>@jettieb</strong></a></td>
+    <td align="center"><a href="https://github.com/yepot"><strong>@yepot</strong></a></td>
+    <td align="center"><a href="https://github.com/topograp2"><strong>@topograp2</strong></a></td>
+  </tr>
+  <tr>
+    <td align="center">김규린</td>
+    <td align="center">복지희</td>
+    <td align="center">양은서</td>
+    <td align="center">홍지형</td>
+  </tr>
+  <tr>
+    <td align="center">방 CRUD api 개발, 한줄일기 CRUD api 개발</td>
+    <td align="center">방 진입, 실시간 음악 재생 관련 웹소켓 api 개발</td>
+    <td align="center">플레이리스트 CRUD api 개발, 배포</td>
+    <td align="center">유저 관련 api 개발, 곡 api 개발, 배포</td>
+  </tr>
+</table>
+
+
+
+## 📁 프로젝트 구조
 ```
-feat: 회원가입 API 구현 #23
-fix: 로그인 시 토큰 누락 버그 수정 #12
-docs: README 커밋 규칙 추가 #1
+📂
+├── .github/
+│   └── ISSUE_TEMPLATE / deveop-issue
+│   └── workflows / deploy.yaml
+│
+├──mavve/
+│   ├── scripts/
+|   │   └──deploy.sh
+│   ├── src/main/
+│   │   ├── java/com/efub/mavve/
+│   │   │   ├── MavveApplication.java
+│   │   │
+│   │   │   ├── auth/                     # 🔐 인증 도메인
+│   │   │   │   ├── controller/
+│   │   │   │   ├── service/
+│   │   │   │   ├── repository/
+│   │   │   │   ├── dto/
+│   │   │   │   └── entity/
+│   │   │
+│   │   │   ├── artist/                    # 🧑‍🎤 아티스트 도메인
+│   │   │   │   ├── service/
+│   │   │   │   ├── repository/
+│   │   │   │   ├── dto/
+│   │   │   │   └── entity/
+│   │   │
+│   │   │   ├── diary/                    # 💬 한줄일기 도메인
+│   │   │   │   ├── controller/
+│   │   │   │   ├── service/
+│   │   │   │   ├── repository/
+│   │   │   │   ├── dto/
+│   │   │   │   └── entity/
+│   │   │
+│   │   │   ├── playlists/               # ❤️ 플레이리스트 도메인
+│   │   │   │   ├── controller/
+│   │   │   │   ├── service/
+│   │   │   │   ├── repository/
+│   │   │   │   └── entity/
+│   │   │
+│   │   │   ├── room/                    # 🏷️ 방 도메인  
+│   │   │   │   ├── controller/
+│   │   │   │   ├── service/
+│   │   │   │   ├── repository/
+│   │   │   │   └── entity/
+│   │   │
+│   │   │
+│   │   │   ├── songs/                   # 🎶 노래 도메인
+│   │   │   │   ├── controller/
+│   │   │   │   ├── service/
+│   │   │   │   ├── repository/
+│   │   │   │   ├── dto/
+│   │   │   │   └── entity/
+│   │   │
+│   │   │
+│   │   │   └── global/
+│   │   │       ├── S3Image/
+│   │   │       ├── config/
+│   │   │       ├── convertor/                          
+│   │   │       ├── exception/           
+│   │   │       ├── response/             
+│   │   │       └── handler/                 
+│   │   │
+│   │   └── resources/
+│   │       ├── application.yml
+│   │       └── static/
+│   └── test/
+│       └── java/com/mavve/
+│           └── ...                      # 테스트 코드들
+└── README.md
+
 ```
 
-## 👥 협업 규칙
-### 1. 브랜치 전략 (Git Flow 기반)
-| 브랜치명          | 용도           |
-| ------------- | ------------ |
-| `main`        | 최종 배포용       |
-| `develop`         | 개발 통합 브랜치    |
-| `feature/기능명` | 각 기능 개발용 브랜치 |
-| `fix/버그명`     | 버그 수정 브랜치    |
-* 예시
-```
-feature/signup-api
-fix/token-expired-bug
-```
-
-### 2. PR 규칙
-* develop 브랜치로 PR 생성
-* PR 제목 예시: [feat] 회원가입 API 구현 #12
-* PR 템플릿을 기반으로 상세 내용 작성
-* PR 리뷰 후 Approve 1명 이상 시 Merge
-
-###  3. 코드 컨벤션
-* 클래스명은 `UpperCamelCase`, 변수/메서드는 `lowerCamelCase`
-* Controller, Service, DTO, Entity 명확하게 분리
-
-## 📚 개발 중 규칙
-* 작업 시작 전 이슈 등록 → 브랜치 생성 → 작업 후 PR
-* 커밋 단위는 너무 작거나 크지 않게 적절히
