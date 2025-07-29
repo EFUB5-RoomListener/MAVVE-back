@@ -20,6 +20,7 @@
 ## 💡 주요 기능
 
 ## 🔧 아키텍처
+<img width="1920" height="1080" alt="mavve_sys_ar" src="https://github.com/user-attachments/assets/72491954-426b-4e71-9378-7c151f831eaf" />
 
 ## 🔨 기술 스택
 **Develop**
@@ -42,10 +43,10 @@
     <td align="center"><img src="https://github.com/topograp2.png" width="100" /></td>
   </tr>
   <tr>
-    <td align="center"><strong>@9rin</strong></td>
-    <td align="center"><strong>@jettieb</strong></td>
-    <td align="center"><strong>@yepot</strong></td>
-    <td align="center"><strong>@topograp2</strong></td>
+    <td align="center"><a href="https://github.com/9rin"><strong>@9rin</strong></a></td>
+    <td align="center"><a href="https://github.com/jettieb"><strong>@jettieb</strong></a></td>
+    <td align="center"><a href="https://github.com/yepot"><strong>@yepot</strong></a></td>
+    <td align="center"><a href="https://github.com/topograp2"><strong>@topograp2</strong></a></td>
   </tr>
   <tr>
     <td align="center">김규린</td>
@@ -74,7 +75,7 @@
 │   ├── scripts/
 |   │   └──deploy.sh
 │   ├── src/main/
-│   │   ├── java/com/mavve/
+│   │   ├── java/com/efub/mavve/
 │   │   │   ├── MavveApplication.java
 │   │   │
 │   │   │   ├── auth/                     # 🔐 인증 도메인
@@ -84,38 +85,33 @@
 │   │   │   │   ├── dto/
 │   │   │   │   └── entity/
 │   │   │
-│   │   │   ├── board/                    # 📌 게시글 도메인
+│   │   │   ├── artist/                    # 🧑‍🎤 아티스트 도메인
+│   │   │   │   ├── service/
+│   │   │   │   ├── repository/
+│   │   │   │   ├── dto/
+│   │   │   │   └── entity/
+│   │   │
+│   │   │   ├── diary/                    # 💬 한줄일기 도메인
 │   │   │   │   ├── controller/
 │   │   │   │   ├── service/
 │   │   │   │   ├── repository/
 │   │   │   │   ├── dto/
 │   │   │   │   └── entity/
 │   │   │
-│   │   │   ├── comment/                  # 💬 댓글 도메인
-│   │   │   │   ├── controller/
-│   │   │   │   ├── service/
-│   │   │   │   ├── repository/
-│   │   │   │   ├── dto/
-│   │   │   │   └── entity/
-│   │   │
-│   │   │   ├── like/                     # ❤️ 좋아요 도메인
+│   │   │   ├── playlists/               # ❤️ 플레이리스트 도메인
 │   │   │   │   ├── controller/
 │   │   │   │   ├── service/
 │   │   │   │   ├── repository/
 │   │   │   │   └── entity/
 │   │   │
-│   │   │   ├── tag/                      # 🏷️ 태그 도메인
+│   │   │   ├── room/                    # 🏷️ 방 도메인  
 │   │   │   │   ├── controller/
 │   │   │   │   ├── service/
 │   │   │   │   ├── repository/
 │   │   │   │   └── entity/
 │   │   │
-│   │   │   ├── image/                    # 🖼️ 이미지 업로드
-│   │   │   │   ├── controller/
-│   │   │   │   ├── service/
-│   │   │   │   └── util/
 │   │   │
-│   │   │   ├── member/                   # 👤 사용자 도메인
+│   │   │   ├── songs/                   # 🎶 노래 도메인
 │   │   │   │   ├── controller/
 │   │   │   │   ├── service/
 │   │   │   │   ├── repository/
