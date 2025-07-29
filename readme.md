@@ -20,7 +20,8 @@
 ## 💡 주요 기능
 
 ## 🔧 아키텍처
-<img width="1920" height="1080" alt="mavve_sys_ar" src="https://github.com/user-attachments/assets/72491954-426b-4e71-9378-7c151f831eaf" />
+<img width="1920" height="1080" alt="mavve_sys_ar" src="https://github.com/user-attachments/assets/6ec7083c-43ab-478a-b5b8-9a2c28aeef7c" />
+
 
 ## 🔨 기술 스택
 **Develop**
