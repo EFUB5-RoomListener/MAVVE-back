@@ -204,8 +204,8 @@ public class RoomService {
                 roomSongRedisService.addCurrentSong(roomId, firstSong, startTime);
                 roomSongWebsocketService.scheduleNextSong(roomId, firstSong);
                 return CurrentSongSummary.from(firstSong, startTime);
-            } else {
-                throw new MavveException(ExceptionCode.SONG_LIST_EMPTY);
+            } else{
+                return null;    // 저장된 노래 시스트가 없을 경우 null 반환
             }
         }
         return roomSongRedisService.getCurrentSong(roomId);
