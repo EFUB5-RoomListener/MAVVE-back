@@ -142,8 +142,12 @@ public class RoomSongRedisService {
 
     // 현재 재생되고 있는 노래 삭제
     public void deleteCurrentSong(Long roomCode){
-        String key = RoomRedisKeyUtils.getCurrentSongKey(roomCode);
-        objectRedisTemplate.delete(key);
+        try{
+            String key = RoomRedisKeyUtils.getCurrentSongKey(roomCode);
+            objectRedisTemplate.delete(key);
+        } catch (Exception e){
+            throw new MavveException(ExceptionCode.REDIS_SAVE_ERROR);
+        }
     }
 
     // 노래 id용 UUID값 생성
