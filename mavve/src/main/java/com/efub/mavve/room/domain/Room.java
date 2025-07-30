@@ -24,7 +24,7 @@ public class Room {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long roomId;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "userId", nullable = false)
     private User user;
 

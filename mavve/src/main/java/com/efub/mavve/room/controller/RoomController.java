@@ -111,14 +111,6 @@ public class RoomController {
         return ResponseEntity.ok(response);
     }
 
-    // 채팅 전체 조회(페이징)
-    @GetMapping("/{roomId}/chats")
-    public ResponseEntity<ChatListResponse> getAllChats(@PathVariable("roomId") Long roomId,
-                                                        @RequestParam(value = "lastChatId", required = false) Long lastChatId){
-        ChatListResponse response = roomChatService.getAllChats(roomId, lastChatId);
-        return ResponseEntity.ok(response);
-    }
-
     // 방에 플레이리스트 추가
     @PostMapping("/{roomId}/playlists")
     public void addPlaylistInRoom(@PathVariable("roomId") Long roomId,
