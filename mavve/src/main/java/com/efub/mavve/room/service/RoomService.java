@@ -176,7 +176,8 @@ public class RoomService {
 
     // 첫 입장자인 경우 처리
     private CurrentSongSummary handleFirstEnter(Long roomId) {
-        if (!roomUserRedisService.hasUsers(roomId)) {
+        // 입장자 없음 + 현재 저장되어 있는 노래가 없는 경우 첫 노래부터 재생 시작
+        if (!roomUserRedisService.hasUsers(roomId) && !roomSongRedisService.hasCurrentSong(roomId)) {
             // 방 생성된 뒤 플레이리스트의 노래들 redis에 저장
             if(!roomSongRedisService.hasSongs(roomId)){
                 roomPlaylistService.addSongsByPlaylist(roomId);

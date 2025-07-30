@@ -68,6 +68,14 @@ public class RoomSongRedisService {
         return result;
     }
 
+    // 현재 노래 리스트 있는지 확인
+    public boolean hasSongs(Long roomCode){
+        String key = RoomRedisKeyUtils.getSongListKey(roomCode);
+        Long songCount = objectRedisTemplate.opsForList().size(key);
+
+        return !(songCount == 0 || songCount == null);
+    }
+
     // 노래 리스트 삭제
     public void deleteSongs(Long roomCode, List<String> songIdsToRemove) {
         try{
@@ -125,14 +133,17 @@ public class RoomSongRedisService {
 
         return CurrentSongSummary.from(song, startTime);
     }
-    
-    // 현재 노래 리스트 있는지 확인
-    public boolean hasSongs(Long roomCode){
-        String key = RoomRedisKeyUtils.getSongListKey(roomCode);
-        Long songCount = objectRedisTemplate.opsForList().size(key);
-        log.info("no song in redis");
 
-        return !(songCount == 0 || songCount == null);
+    // 현재 재생되고 있는 노래 있는지 확인
+    public boolean hasCurrentSong(Long roomCode) {
+        String key = RoomRedisKeyUtils.getCurrentSongKey(roomCode);
+        return objectRedisTemplate.opsForHash().hasKey(key, "song");
+    }
+
+    // 현재 재생되고 있는 노래 삭제
+    public void deleteCurrentSong(Long roomCode){
+        String key = RoomRedisKeyUtils.getCurrentSongKey(roomCode);
+        objectRedisTemplate.delete(key);
     }
 
     // 노래 id용 UUID값 생성
