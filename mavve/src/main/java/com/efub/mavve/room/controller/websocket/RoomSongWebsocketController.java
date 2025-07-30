@@ -8,7 +8,7 @@ import com.efub.mavve.room.payload.response.DeleteSongResponsePayload;
 import com.efub.mavve.room.payload.response.MessageType;
 import com.efub.mavve.room.payload.response.SubscribeResponsePayload;
 import com.efub.mavve.room.service.websocket.RoomSongWebsocketService;
-import lombok.RequiredArgsConstructor;
+import lombok.RequiredArgsConstructor; 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
