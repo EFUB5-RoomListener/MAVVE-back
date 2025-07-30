@@ -38,4 +38,5 @@ public enum ClientExceptionCode {
     NO_SESSION_ID,
 
     SPOTIFY_REISSUE_ERROR,
+    CHAT_NOT_FOUND,
 }
