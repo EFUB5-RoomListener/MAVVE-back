@@ -61,7 +61,7 @@ public class RoomSongWebsocketService {
         taskScheduler.schedule(() -> {
             // 방에 사용자 있는지 확인하고 스케쥴링
             if(!userRedisService.hasUsers(roomCode)){
-                log.info("no user! stop scheduling");
+                songRedisService.deleteCurrentSong(roomCode);
                 return;
             }
             SongRedis nextSong = songRedisService.getNextSong(roomCode, currentSong);

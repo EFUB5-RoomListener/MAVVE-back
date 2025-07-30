@@ -55,8 +55,8 @@ public class RoomController {
 
     // 공개된 방 리스트 전체 조회
     @GetMapping
-    public ResponseEntity<RoomListResponse> getListRoom(){
-        RoomListResponse response = roomService.getListRoom();
+    public ResponseEntity<RoomListResponse> getListRoom(@AuthenticationPrincipal User user){
+        RoomListResponse response = roomService.getListRoom(user);
         return ResponseEntity.ok(response);
     }
 
@@ -76,22 +76,23 @@ public class RoomController {
 
     // 조회순으로 공개된 방 리스트 Top5 조회
     @GetMapping("/hot")
-    public ResponseEntity<RoomListResponse> getHotListRoom(){
-        RoomListResponse response = roomService.getHotListRoom();
+    public ResponseEntity<RoomListResponse> getHotListRoom(@AuthenticationPrincipal User user){
+        RoomListResponse response = roomService.getHotListRoom(user);
         return ResponseEntity.ok(response);
     }
 
     // 좋아요 순으로 TOP5 공개된 방 조회
     @GetMapping("/like")
-    public ResponseEntity<RoomListResponse> getLikeListRoom(){
-        RoomListResponse response = roomService.getLikeListRoom();
+    public ResponseEntity<RoomListResponse> getLikeListRoom(@AuthenticationPrincipal User user){
+        RoomListResponse response = roomService.getLikeListRoom(user);
         return ResponseEntity.ok(response);
     }
 
     // 방 검색
     @GetMapping("/search")
-    public ResponseEntity<RoomListResponse> searchRoom(@RequestParam("keyword") String keyword){
-        RoomListResponse response = roomService.searchRoom(keyword);
+    public ResponseEntity<RoomListResponse> searchRoom(@RequestParam("keyword") String keyword,
+                                                       @AuthenticationPrincipal User user){
+        RoomListResponse response = roomService.searchRoom(keyword, user);
         return ResponseEntity.ok(response);
     }
 

@@ -4,6 +4,7 @@ import com.efub.mavve.auth.domain.User;
 import com.efub.mavve.global.exception.ExceptionCode;
 import com.efub.mavve.global.exception.MavveException;
 import com.efub.mavve.room.domain.Room;
+import com.efub.mavve.room.domain.RoomLike;
 import com.efub.mavve.room.dto.projection.RoomLikeCountProjection;
 import com.efub.mavve.room.dto.request.RoomCreateRequest;
 import com.efub.mavve.room.dto.request.RoomUpdateRequest;
@@ -24,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -41,7 +43,7 @@ public class RoomService {
     @Transactional
     public RoomResponse createRoom(RoomCreateRequest request, User user){
         Room room = roomRepository.save(request.toEntity(user));
-        return RoomResponse.from(room, 0);
+        return RoomResponse.from(room, 0, false);
     }
 
     // 방 수정
@@ -56,7 +58,7 @@ public class RoomService {
         room.changeIsPublic(request.isPublic());
         int likeCount = roomLikeRepository.countByRoom(room);
 
-        return RoomResponse.from(room, likeCount);
+        return RoomResponse.from(room, likeCount, getLiked(room, user));
     }
 
     // 방 삭제
@@ -69,13 +71,13 @@ public class RoomService {
 
     // 공개된 방 리스트 전체 조회
     @Transactional(readOnly = true)
-    public RoomListResponse getListRoom() {
+    public RoomListResponse getListRoom(User user) {
         List<Room> roomList = roomRepository.findAll();
 
         List<RoomResponse> responseList = roomList.stream().filter(Room::isPublic)
                 .map(room -> {
                     int likeCount = roomLikeRepository.countByRoom(room);
-                    return RoomResponse.from(room, likeCount);})
+                    return RoomResponse.from(room, likeCount, getLiked(room, user));})
                 .collect(Collectors.toList());
 
         return RoomListResponse.from(responseList);
@@ -89,7 +91,7 @@ public class RoomService {
         List<RoomResponse> responseList = roomList.stream()
                 .map(room -> {
                     int likeCount = roomLikeRepository.countByRoom(room);
-                    return RoomResponse.from(room, likeCount);})
+                    return RoomResponse.from(room, likeCount, getLiked(room, user));})
                 .collect(Collectors.toList());
 
         return RoomListResponse.from(responseList);
@@ -103,47 +105,47 @@ public class RoomService {
         List<RoomResponse> responseList = roomList.stream()
                 .map(room -> {
                     int likeCount = roomLikeRepository.countByRoom(room);
-                    return RoomResponse.from(room, likeCount);})
+                    return RoomResponse.from(room, likeCount, getLiked(room, user));})
                 .collect(Collectors.toList());
         return RoomListResponse.from(responseList);
     }
 
     // 조회순으로 공개된 방 리스트 Top5 조회
     @Transactional(readOnly = true)
-    public RoomListResponse getHotListRoom(){
+    public RoomListResponse getHotListRoom(User user){
         List<Room> roomList = roomRepository.findTop5ByIsPublicTrueOrderByViewCountDesc();
 
         List<RoomResponse> responseList = roomList.stream()
                 .map(room -> {
                     int likeCount = roomLikeRepository.countByRoom(room);
-                    return RoomResponse.from(room, likeCount);})
+                    return RoomResponse.from(room, likeCount, getLiked(room, user));})
                 .collect(Collectors.toList());
         return RoomListResponse.from(responseList);
     }
 
     // 좋아요 순으로 TOP5 공개된 방 조회
     @Transactional(readOnly = true)
-    public RoomListResponse getLikeListRoom(){
+    public RoomListResponse getLikeListRoom(User user){
         List<RoomLikeCountProjection> projection = roomRepository.findTop5ByIsPublicTrueOrderByLikeCountDesc();
 
         List<RoomResponse> responseList = projection.stream()
                 .map(proj -> {
                     Room room = findByRoomId(proj.getRoomId());
                     int likeCount = roomLikeRepository.countByRoom(room);
-                    return RoomResponse.from(room, likeCount);})
+                    return RoomResponse.from(room, likeCount, getLiked(room, user));})
                 .collect(Collectors.toList());
         return RoomListResponse.from(responseList);
     }
 
     // 방 검색
     @Transactional(readOnly = true)
-    public RoomListResponse searchRoom(String keyword){
+    public RoomListResponse searchRoom(String keyword, User user){
         List<Room> roomList = roomRepository.findByRoomNameContainingIgnoreCaseAndIsPublicTrueOrderByCreatedAtDesc(keyword);
 
         List<RoomResponse> responseList = roomList.stream()
                 .map(room -> {
                     int likeCount = roomLikeRepository.countByRoom(room);
-                    return RoomResponse.from(room, likeCount);})
+                    return RoomResponse.from(room, likeCount, getLiked(room, user));})
                 .collect(Collectors.toList());
         return RoomListResponse.from(responseList);
     }
@@ -174,9 +176,19 @@ public class RoomService {
         return RoomEnterResponse.from(room, songList, duration, currentSong);
     }
 
+    // 좋아요 눌렀는지 확인
+    @Transactional(readOnly = true)
+    public boolean getLiked(Room room, User user){
+        Optional<RoomLike> existingLike = roomLikeRepository.findByUserAndRoom(user, room);
+
+        if (existingLike.isPresent()) {return true;}
+        else {return false;}
+    }
+
     // 첫 입장자인 경우 처리
     private CurrentSongSummary handleFirstEnter(Long roomId) {
-        if (!roomUserRedisService.hasUsers(roomId)) {
+        // 입장자 없음 + 현재 저장되어 있는 노래가 없는 경우 첫 노래부터 재생 시작
+        if (!roomUserRedisService.hasUsers(roomId) && !roomSongRedisService.hasCurrentSong(roomId)) {
             // 방 생성된 뒤 플레이리스트의 노래들 redis에 저장
             if(!roomSongRedisService.hasSongs(roomId)){
                 roomPlaylistService.addSongsByPlaylist(roomId);
