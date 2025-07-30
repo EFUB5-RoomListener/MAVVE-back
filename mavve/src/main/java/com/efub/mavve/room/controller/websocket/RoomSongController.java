@@ -23,11 +23,12 @@ import java.security.Principal;
 @Controller
 @RequiredArgsConstructor
 @Slf4j
-public class RoomSongWebsocketController {
+@MessageMapping("/rooms")
+public class RoomSongController {
     private final SimpMessageSendingOperations messagingTemplate;
     private final RoomSongWebsocketService roomSongWebsocketService;
 
-    @SubscribeMapping("/rooms/{roomCode}/songs")
+    @SubscribeMapping("/{roomCode}/songs")
     public SubscribeResponsePayload subscribe(@DestinationVariable Long roomCode,
                                               Principal principal,
                                               Message<?> message) {
@@ -36,13 +37,13 @@ public class RoomSongWebsocketController {
         return new SubscribeResponsePayload(MessageType.SUBSCRIBE_COMPLETE);
     }
 
-    @MessageMapping("/rooms/{roomCode}/add-song")
+    @MessageMapping("/{roomCode}/add-song")
     public void addSong(@DestinationVariable Long roomCode, @Payload AddSongRequestPayload request) {
         AddSongResponsePayload response = roomSongWebsocketService.addSong(roomCode, request);
         messagingTemplate.convertAndSend("/topic/rooms/" + roomCode + "/songs", response);
     }
 
-    @MessageMapping("/rooms/{roomCode}/delete-song")
+    @MessageMapping("/{roomCode}/delete-song")
     public void deleteSongs(@DestinationVariable Long roomCode, @Payload DeleteSongRequestPayload request){
         DeleteSongResponsePayload response = roomSongWebsocketService.deleteSongs(roomCode, request);
         messagingTemplate.convertAndSend("/topic/rooms/" + roomCode + "/songs", response);
