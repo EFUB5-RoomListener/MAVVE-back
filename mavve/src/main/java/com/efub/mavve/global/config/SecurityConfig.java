@@ -29,7 +29,23 @@ public class SecurityConfig {
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
                 .authorizeHttpRequests(auth ->
-                        auth.requestMatchers("/**").permitAll() // 추후 변경 예정
+                        auth.requestMatchers(
+//                                        "/**"
+                                // TODO: http 메서드 별로 변경 필요
+                                        "/auth/redirect/**",
+                                        "/auth/login",
+                                        "/rooms",
+                                        "/rooms/*/enter",
+                                        "/rooms/*/chats/**",
+                                        "/rooms/hot",
+                                        "/rooms/like",
+                                        "/rooms/*/playlists",
+                                        "/diaries",
+                                        "/playlists/search/**",
+                                        "/image/**",
+                                        "/pub/**",
+                                        "/topic/**"
+                                ).permitAll()
                                 .anyRequest().authenticated()
                 )
                 .addFilterBefore(
