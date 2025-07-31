@@ -40,6 +40,8 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
         );
 
         response.setStatus(HttpStatus.UNAUTHORIZED.value());
+        response.setHeader("Access-Control-Allow-Origin", "*");
+        response.setHeader("Access-Control-Allow-Credentials", "true");
         response.setContentType("application/json;charset=UTF-8");
         objectMapper.writeValue(response.getWriter(), responseBody);
     }
