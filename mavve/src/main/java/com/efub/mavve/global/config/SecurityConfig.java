@@ -32,19 +32,19 @@ public class SecurityConfig {
                         auth.requestMatchers(
                                         "/**"
                                 // TODO: http 메서드 별로 변경 필요
-//                                        "/auth/redirect/**",
-//                                        "/auth/login",
-//                                        "/rooms",
-//                                        "/rooms/*/enter",
-//                                        "/rooms/*/chats/**",
-//                                        "/rooms/hot",
-//                                        "/rooms/like",
-//                                        "/rooms/*/playlists",
-//                                        "/diaries",
-//                                        "/playlists/search/**",
-//                                        "/image/**",
-//                                        "/pub/**",
-//                                        "/topic/**"
+                                        // "/auth/redirect/**",
+                                        // "/auth/login",
+                                        // "/rooms",
+                                        // "/rooms/*/enter",
+                                        // "/rooms/*/chats/**",
+                                        // "/rooms/hot",
+                                        // "/rooms/like",
+                                        // "/rooms/*/playlists",
+                                        // "/diaries",
+                                        // "/playlists/search/**",
+                                        // "/image/**",
+                                        // "/pub/**",
+                                        // "/topic/**"
                                 ).permitAll()
                                 .anyRequest().authenticated()
                 )
