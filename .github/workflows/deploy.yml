@@ -2,65 +2,53 @@ name: Deploy to Amazon EC2
 
 on:
   push:
-    branches: ["deploy"]
+    branches: ["deploy-v2"]
 
 env:
   AWS_REGION: ap-northeast-2
-  S3_BUCKET_NAME: mavve-s3
-  CODE_DEPLOY_APPLICATION_NAME: mavve-codedeploy-app
-  CODE_DEPLOY_DEPLOYMENT_GROUP_NAME: mavve-codedeploy-deployment-group
-
-permissions:
-  contents: read
+  S3_BUCKET_NAME: mavve-deploy-bucket
+  CODE_DEPLOY_APPLICATION_NAME: mavve-deploy
+  CODE_DEPLOY_DEPLOYMENT_GROUP_NAME: mavve-deploy-group
 
 jobs:
   deploy:
-    name: Deploy
     runs-on: ubuntu-latest
-    environment: production
-
+    permissions:
+      contents: read
+      packages: write
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
+      # JDK 17 설치
       - name: Set up JDK 17
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v4
         with:
-          distribution: 'temurin'
           java-version: '17'
-
-      - name: make application.yml
-        run: |
-          mkdir -p ./mavve/src/main/resources
-          cd ./mavve/src/main/resources
-          touch ./application.yml
-          echo "${{ secrets.APPLICATION_YML }}" > ./application.yml
+          distribution: 'temurin'
 
       - name: Build with Gradle
         run: |
-          cd mavve
+          cd ./mavve
           chmod +x ./gradlew
           ./gradlew build -x test
+
+      - name: Make zip file
+        run: zip -r ./$GITHUB_SHA.zip .
+        shell: bash
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-access-key-id: ${{ secrets.CICD_ACCESS_KEY }}
+          aws-secret-access-key: ${{ secrets.CICD_SECRET_KEY }}
           aws-region: ${{ env.AWS_REGION }}
 
-      - name: Upload to AWS S3
-        run: |
-          aws deploy push \
-            --application-name ${{ env.CODE_DEPLOY_APPLICATION_NAME }} \
-            --ignore-hidden-files \
-            --s3-location s3://$S3_BUCKET_NAME/$GITHUB_SHA.zip \
-            --source ./mavve
+      - name: Upload to S3
+        run: aws s3 cp --region ap-northeast-2 ./$GITHUB_SHA.zip s3://$S3_BUCKET_NAME/$GITHUB_SHA.zip
 
-      - name: Deploy to AWS EC2 from S3
-        run: |
-          aws deploy create-deployment \
-            --application-name ${{ env.CODE_DEPLOY_APPLICATION_NAME }} \
-            --deployment-config-name CodeDeployDefault.AllAtOnce \
-            --deployment-group-name ${{ env.CODE_DEPLOY_DEPLOYMENT_GROUP_NAME }} \
-            --s3-location bucket=$S3_BUCKET_NAME,key=$GITHUB_SHA.zip,bundleType=zip
+      - name: EC2에 배포
+        run: >
+          aws deploy create-deployment --application-name $CODE_DEPLOY_APPLICATION_NAME
+          --deployment-config-name CodeDeployDefault.AllAtOnce
+          --deployment-group-name $CODE_DEPLOY_DEPLOYMENT_GROUP_NAME
+          --s3-location bucket=$S3_BUCKET_NAME,key=$GITHUB_SHA.zip,bundleType=zip
