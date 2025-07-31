@@ -2,16 +2,24 @@ version: 0.0
 os: linux
 
 files:
-  - source: /
-    destination: /home/ubuntu/app
+  - source: /mavve/build/libs
+    destination: /home/ubuntu/MAVVE-back/build/libs
     overwrite: yes
+file_exists_behavior: OVERWRITE
 
 permissions:
   - object: /
+    pattern: "**"
     owner: ubuntu
     group: ubuntu
 
 hooks:
-  ApplicationStart:
-    - location: mavve/scripts/deploy.sh
+  AfterInstall:
+    - location: scripts/stop.sh
       timeout: 60
+      runas: ubuntu
+
+  ApplicationStart:
+    - location: scripts/start.sh
+      timeout: 60
+      runas: ubuntu
