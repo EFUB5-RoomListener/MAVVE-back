@@ -52,6 +52,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                throw new CustomAuthenticationException(
                        ExceptionCode.AUTH_TOKEN_EMPTY, ExceptionCode.AUTH_TOKEN_EMPTY.getMessage(), null);
             }
+//            else{
+//               throw new CustomAuthenticationException(
+//                       ExceptionCode.AUTH_TOKEN_EMPTY, ExceptionCode.AUTH_TOKEN_EMPTY.getMessage(), null);
+//            }
             filterChain.doFilter(request, response);
         } catch (AuthenticationException exception){
             authenticationEntryPoint.commence(request, response, exception);
