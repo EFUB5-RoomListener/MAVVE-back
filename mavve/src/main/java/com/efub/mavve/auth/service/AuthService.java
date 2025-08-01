@@ -71,13 +71,13 @@ public class AuthService {
     }
 
     @Transactional
-    public void logout(User user, String accessToken, HttpServletResponse response, String refreshToken) {
+    public void logout(User user, String accessToken, HttpServletResponse response) {
         refreshTokenService.deleteRefreshToken(user.getUserId().toString());
         String originAccessToken = accessToken.substring(7);
         long remainingTime = jwtResolver.getRemainingTime(originAccessToken);
         tokenService.registerBlackList(originAccessToken, remainingTime);
 
-        Cookie cookie = new Cookie("refreshToken", null);
+        Cookie cookie = new Cookie("refresh_token", null);
         cookie.setMaxAge(0);
         cookie.setPath("/");
         cookie.setHttpOnly(true);
