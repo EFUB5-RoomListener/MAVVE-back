@@ -89,11 +89,11 @@ public class PlaylistController {
     }
 
     // 플레이리스트에 노래 삭제
-    @DeleteMapping("/{playlistId}/songs/{songId}")
+    @DeleteMapping("/{playlistId}/songs/{spotifySongId}")
     public ResponseEntity<Void> deleteSongInPlaylist(@AuthenticationPrincipal User user,
                                                  @PathVariable("playlistId") Long playlistId,
-                                                 @PathVariable("songId") Long songId){
-        playlistService.deleteSongInPlaylist(user, playlistId, songId);
+                                                 @PathVariable("spotifySongId") String spotifySongId){
+        playlistService.deleteSongInPlaylist(user, playlistId, spotifySongId);
         return ResponseEntity.noContent().build();
     }
 }
