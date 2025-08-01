@@ -16,6 +16,7 @@ import com.efub.mavve.songs.domain.Song;
 import com.efub.mavve.songs.dto.response.SongResponse;
 import com.efub.mavve.songs.service.SongShareService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,6 +27,7 @@ import static com.efub.mavve.songs.service.spotify.SearchType.playlist;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class PlaylistService {
 
     private final PlaylistRepository playlistRepository;
@@ -117,10 +119,10 @@ public class PlaylistService {
     }
 
     @Transactional
-    public void deleteSongInPlaylist(User user, Long playlistId, Long songId) {
+    public void deleteSongInPlaylist(User user, Long playlistId, String spotifySongId) {
         Playlist playlist = getPlaylistOrThrow(playlistId);
         validatePlaylistOwner(playlist, user);
-        Song song = songShareService.getSongBySongId(songId);
+        Song song = songShareService.getSongBySpotifySongId(spotifySongId);
         PlaylistSong target = playlistSongService.getPlaylistSongByPlaylistAndSong(playlist, song);
         playlist.removeSong(song, target);
     }
