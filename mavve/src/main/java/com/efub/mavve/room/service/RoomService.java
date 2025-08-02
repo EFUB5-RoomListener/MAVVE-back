@@ -202,11 +202,7 @@ public class RoomService {
             SongRedis firstSong = roomSongRedisService.getFirstSongInRoom(roomId);
             if (firstSong != null) {
                 log.info("first user!!");
-                LocalDateTime startTime = LocalDateTime.now();
-
-                // 현재 노래 저장 및 다음 노래 스케쥴링
-                roomSongRedisService.addCurrentSong(roomId, firstSong, startTime);
-                roomSongService.scheduleNextSong(roomId, firstSong);
+                LocalDateTime startTime = roomSongService.startFirstSong(roomId, firstSong);
                 return CurrentSongSummary.from(firstSong, startTime);
             } else{
                 return null;    // 저장된 노래 시스트가 없을 경우 null 반환
