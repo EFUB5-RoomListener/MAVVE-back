@@ -17,6 +17,7 @@ public class RoomResponse {
     private Long roomId;
     private Long userId;
     private String roomName;
+    private String userName;
     private Long viewCount;
     private int likeCount;
     private List<String> tag;
@@ -24,13 +25,15 @@ public class RoomResponse {
     private boolean isPublic;
     private LocalDateTime createdAt;
     private boolean liked;
+    private String duration;
 
 
-    public static RoomResponse from(Room room, int likeCount, boolean liked){
+    public static RoomResponse from(Room room, int likeCount, boolean liked, String duration){
         return RoomResponse.builder()
                 .roomId(room.getRoomId())
                 .userId(room.getUser().getUserId())
                 .roomName(room.getRoomName())
+                .userName(room.getUser().getUsername())
                 .viewCount(room.getViewCount())
                 .likeCount(likeCount)
                 .liked(liked)
@@ -38,6 +41,7 @@ public class RoomResponse {
                 .imageURL(room.getImageURL())
                 .isPublic(room.isPublic())
                 .createdAt(room.getCreatedAt())
+                .duration(duration)
                 .build();
     }
 
