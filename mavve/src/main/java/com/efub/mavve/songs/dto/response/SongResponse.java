@@ -1,5 +1,6 @@
 package com.efub.mavve.songs.dto.response;
 
+import com.efub.mavve.playlist.domain.PlaylistSong;
 import com.efub.mavve.songs.domain.Song;
 import com.efub.mavve.songs.domain.SongArtist;
 import com.efub.mavve.songs.dto.response.spotify.SearchSongResponse;
@@ -9,6 +10,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Slf4j
@@ -29,6 +31,8 @@ public class SongResponse {
     @NotBlank(message = "곡의 총 길이가 누락되었습니다.")
     private final int duration;
 
+    private final LocalDateTime createdAt;
+
     public static List<SongResponse> fromSpotifyResponse(SearchSongResponse searchSongResponse) {
         return searchSongResponse.getTracks().getItems().stream()
                 .map(trackItem -> SongResponse.builder()
@@ -41,7 +45,7 @@ public class SongResponse {
                         .build()).toList();
     }
 
-    public static SongResponse fromSongEntity(Song song) {
+    public static SongResponse fromSongEntity(PlaylistSong playlistSong, Song song) {
         return SongResponse.builder()
                 .spotifySongId(song.getSpotifySongId())
                 .album(song.getAlbum())
@@ -49,6 +53,7 @@ public class SongResponse {
                 .duration(song.getDuration())
                 .coverUrl(song.getCoverImageUrl())
                 .artist(song.getSongArtists().stream().map(songArtist -> songArtist.getArtist().getArtistName()).toList())
+                .createdAt(playlistSong.getCreatedAt())
                 .build();
     }
 }
