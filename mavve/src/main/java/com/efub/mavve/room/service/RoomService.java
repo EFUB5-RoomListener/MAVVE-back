@@ -1,6 +1,7 @@
 package com.efub.mavve.room.service;
 
 import com.efub.mavve.auth.domain.User;
+import com.efub.mavve.auth.repository.UserRepository;
 import com.efub.mavve.global.exception.ExceptionCode;
 import com.efub.mavve.global.exception.MavveException;
 import com.efub.mavve.room.domain.Room;
@@ -11,6 +12,8 @@ import com.efub.mavve.room.dto.request.RoomUpdateRequest;
 import com.efub.mavve.room.dto.response.RoomEnterResponse;
 import com.efub.mavve.room.dto.response.RoomListResponse;
 import com.efub.mavve.room.dto.response.RoomResponse;
+import com.efub.mavve.room.dto.response.RoomUserResponse;
+import com.efub.mavve.room.dto.summary.RoomUserSummary;
 import com.efub.mavve.room.payload.summary.CurrentSongSummary;
 import com.efub.mavve.room.payload.summary.SongRedis;
 import com.efub.mavve.room.repository.RoomRepository;
@@ -38,6 +41,7 @@ public class RoomService {
     private final RoomSongWebsocketService roomSongWebsocketService;
     private final RoomPlaylistService roomPlaylistService;
     private final RoomLikeRepository roomLikeRepository;
+    private final UserRepository userRepository;
 
     // 방 생성
     @Transactional
@@ -225,5 +229,15 @@ public class RoomService {
         if(hours > 0) return String.format("%d시간 %d분 %d초", hours, minutes, seconds);
         else if (minutes > 0) return String.format("%d분 %d초", minutes, seconds);
         else return String.format("%d초", seconds);
+    }
+
+    public RoomUserResponse getUserInRoom(Long roomId) {
+        List<String> userIds = roomUserRedisService.getAllUsers(roomId);
+        List<RoomUserSummary> users = userIds.stream().map(userId -> {
+            User user = userRepository.findByUserId(Long.parseLong(userId))
+                    .orElseThrow(() -> new MavveException(ExceptionCode.USER_NOT_FOUND));
+            return RoomUserSummary.from(user);
+        }).collect(Collectors.toList());
+        return RoomUserResponse.from(users);
     }
 }
