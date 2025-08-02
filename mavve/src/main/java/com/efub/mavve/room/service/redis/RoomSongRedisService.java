@@ -20,10 +20,9 @@ public class RoomSongRedisService {
     private final RedisTemplate<String, Object> objectRedisTemplate;
 
     // 노래 추가
-    public SongRedis addSong(Long roomCode, SongSummary request) {
+    public SongRedis addSong(Long roomCode, SongRedis song) {
         try{
             String key = RoomRedisKeyUtils.getSongListKey(roomCode);
-            SongRedis song = SongSummary.toRedisPOJO(request);
             objectRedisTemplate.opsForList().rightPush(key, song); // 리스트 맨 뒤에 추가
 
             return song;
