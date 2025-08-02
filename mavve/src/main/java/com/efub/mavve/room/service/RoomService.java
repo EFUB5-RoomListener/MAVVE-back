@@ -43,11 +43,14 @@ public class RoomService {
     private final RoomLikeRepository roomLikeRepository;
     private final UserRepository userRepository;
 
+
+
     // 방 생성
     @Transactional
     public RoomResponse createRoom(RoomCreateRequest request, User user){
         Room room = roomRepository.save(request.toEntity(user));
-        return RoomResponse.from(room, 0, false);
+        String duration = getDuration(room);
+        return RoomResponse.from(room, 0, false, duration);
     }
 
     // 방 수정
@@ -61,8 +64,9 @@ public class RoomService {
         if(request.imageURL()!=null){room.changeImageURL(request.imageURL());}
         room.changeIsPublic(request.isPublic());
         int likeCount = roomLikeRepository.countByRoom(room);
+        String duration = getDuration(room);
 
-        return RoomResponse.from(room, likeCount, getLiked(room, user));
+        return RoomResponse.from(room, likeCount, getLiked(room, user), duration);
     }
 
     // 방 삭제
@@ -81,7 +85,8 @@ public class RoomService {
         List<RoomResponse> responseList = roomList.stream().filter(Room::isPublic)
                 .map(room -> {
                     int likeCount = roomLikeRepository.countByRoom(room);
-                    return RoomResponse.from(room, likeCount, getLiked(room, user));})
+                    String duration = getDuration(room);
+                    return RoomResponse.from(room, likeCount, getLiked(room, user), duration);})
                 .collect(Collectors.toList());
 
         return RoomListResponse.from(responseList);
@@ -95,7 +100,8 @@ public class RoomService {
         List<RoomResponse> responseList = roomList.stream()
                 .map(room -> {
                     int likeCount = roomLikeRepository.countByRoom(room);
-                    return RoomResponse.from(room, likeCount, getLiked(room, user));})
+                    String duration = getDuration(room);
+                    return RoomResponse.from(room, likeCount, getLiked(room, user), duration);})
                 .collect(Collectors.toList());
 
         return RoomListResponse.from(responseList);
@@ -109,7 +115,8 @@ public class RoomService {
         List<RoomResponse> responseList = roomList.stream()
                 .map(room -> {
                     int likeCount = roomLikeRepository.countByRoom(room);
-                    return RoomResponse.from(room, likeCount, getLiked(room, user));})
+                    String duration = getDuration(room);
+                    return RoomResponse.from(room, likeCount, getLiked(room, user), duration);})
                 .collect(Collectors.toList());
         return RoomListResponse.from(responseList);
     }
@@ -122,7 +129,8 @@ public class RoomService {
         List<RoomResponse> responseList = roomList.stream()
                 .map(room -> {
                     int likeCount = roomLikeRepository.countByRoom(room);
-                    return RoomResponse.from(room, likeCount, getLiked(room, user));})
+                    String duration = getDuration(room);
+                    return RoomResponse.from(room, likeCount, getLiked(room, user), duration);})
                 .collect(Collectors.toList());
         return RoomListResponse.from(responseList);
     }
@@ -136,7 +144,8 @@ public class RoomService {
                 .map(proj -> {
                     Room room = findByRoomId(proj.getRoomId());
                     int likeCount = roomLikeRepository.countByRoom(room);
-                    return RoomResponse.from(room, likeCount, getLiked(room, user));})
+                    String duration = getDuration(room);
+                    return RoomResponse.from(room, likeCount, getLiked(room, user), duration);})
                 .collect(Collectors.toList());
         return RoomListResponse.from(responseList);
     }
@@ -149,7 +158,8 @@ public class RoomService {
         List<RoomResponse> responseList = roomList.stream()
                 .map(room -> {
                     int likeCount = roomLikeRepository.countByRoom(room);
-                    return RoomResponse.from(room, likeCount, getLiked(room, user));})
+                    String duration = getDuration(room);
+                    return RoomResponse.from(room, likeCount, getLiked(room, user), duration);})
                 .collect(Collectors.toList());
         return RoomListResponse.from(responseList);
     }
@@ -166,6 +176,14 @@ public class RoomService {
         if(!user.getUserId().equals(room.getUser().getUserId())){
             throw new MavveException(ExceptionCode.ROOM_OWNER_MISMATCH);
         }
+    }
+
+    // Duration 가져오기
+    public String getDuration(Room room){
+        if (!roomSongRedisService.hasSongs(room.getRoomId())) {roomPlaylistService.addSongsByPlaylist(room.getRoomId());}
+        List<SongRedis> songList = roomSongRedisService.getAllSongsInRoom(room.getRoomId());
+        log.info("song count : {}", songList.size());
+        return getTotalDurationTime(songList);
     }
 
     // 방 입장 시 방 정보 + 플레이리스트 + 현재 재생중인 노래 전달
