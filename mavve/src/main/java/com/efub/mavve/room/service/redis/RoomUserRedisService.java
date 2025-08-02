@@ -40,11 +40,11 @@ public class RoomUserRedisService {
     }
 
     // 현재 방에 남이있는 사용자 전체 조회
-    public List<String> getAllUsers(Long roomCode) {
+    private List<String> getAllUsers(Long roomCode) {
         String key = RoomRedisKeyUtils.getUserListKey(roomCode);
         List<String> userList = stringRedisTemplate.opsForList().range(key, 0, -1);
 
-        if(userList == null || userList.isEmpty()) return Collections.emptyList();
+        if(userList == null) return Collections.emptyList();
         return userList;
     }
 
