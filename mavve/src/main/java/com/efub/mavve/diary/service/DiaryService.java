@@ -101,7 +101,7 @@ public class DiaryService {
     }
 
     // 하루가 지나면 모든 일기 삭제
-    @Scheduled(cron = "0 0 0 * * *")
+    @Scheduled(cron = "0 0 0 * * *", zone = "Asia/Seoul")
     @Transactional
     @Async
     public void deleteOldDiaries() {
