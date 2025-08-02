@@ -111,13 +111,6 @@ public class RoomController {
         return ResponseEntity.ok(response);
     }
 
-    // 방 내부 사용자 조회
-    @GetMapping("/{roomId}/users")
-    public ResponseEntity<RoomUserResponse> getUserInRoom(@PathVariable("roomId") Long roomId){
-        RoomUserResponse response = roomService.getUserInRoom(roomId);
-        return ResponseEntity.ok(response);
-    }
-
     // 방에 플레이리스트 추가
     @PostMapping("/{roomId}/playlists")
     public void addPlaylistInRoom(@PathVariable("roomId") Long roomId,
