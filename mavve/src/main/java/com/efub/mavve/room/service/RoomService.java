@@ -178,6 +178,19 @@ public class RoomService {
         }
     }
 
+    // 노래 총 재생시간 00:00:00 형태 String으로 변환
+    private String getTotalDuration(List<SongRedis> songs){
+        int totalMillis = songs.stream()
+                .mapToInt(SongRedis::getDuration)
+                .sum();
+        int totalSeconds = totalMillis / 1000;
+
+        int hours = totalSeconds / 3600;
+        int minutes = (totalSeconds % 3600) / 60;
+        int seconds = totalSeconds % 60;
+
+        return String.format("%02d:%02d:%02d", hours, minutes, seconds);
+    }
     // Duration 가져오기
     public String getDuration(Room room){
         if (!roomSongRedisService.hasSongs(room.getRoomId())) {roomPlaylistService.addSongsByPlaylist(room.getRoomId());}
@@ -185,6 +198,8 @@ public class RoomService {
         log.info("song count : {}", songList.size());
         return getTotalDuration(songList);
     }
+
+
 
     // 방 입장 시 방 정보 + 플레이리스트 + 현재 재생중인 노래 전달
     @Transactional(readOnly = true)
@@ -245,19 +260,6 @@ public class RoomService {
         else return String.format("%d초", seconds);
     }
 
-    // 노래 총 재생시간 00:00:00 형태 String으로 변환
-    private String getTotalDuration(List<SongRedis> songs){
-        int totalMillis = songs.stream()
-                .mapToInt(SongRedis::getDuration)
-                .sum();
-        int totalSeconds = totalMillis / 1000;
-
-        int hours = totalSeconds / 3600;
-        int minutes = (totalSeconds % 3600) / 60;
-        int seconds = totalSeconds % 60;
-
-        return String.format("%02d:%02d:%02d", hours, minutes, seconds);
-    }
 
     public RoomUserResponse getUserInRoom(Long roomId) {
         List<String> userIds = roomUserRedisService.getAllUsers(roomId);
