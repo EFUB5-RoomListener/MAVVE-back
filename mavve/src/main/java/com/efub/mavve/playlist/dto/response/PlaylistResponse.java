@@ -16,7 +16,7 @@ public record PlaylistResponse(Long playlistId,
 
     public static PlaylistResponse from(Playlist playlist) {
         List<SongResponse> songResponses = playlist.getPlaylistSongs().stream()
-                .map(playlistSong -> SongResponse.fromSongEntity(playlistSong.getSong()))
+                .map(playlistSong -> SongResponse.fromSongEntity(playlistSong, playlistSong.getSong()))
                 .collect(Collectors.toList());
 
         return new PlaylistResponse(

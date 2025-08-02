@@ -12,6 +12,7 @@ import com.efub.mavve.playlist.dto.response.PlaylistListResponse;
 import com.efub.mavve.playlist.dto.response.PlaylistResponse;
 import com.efub.mavve.playlist.dto.summary.PlaylistSummary;
 import com.efub.mavve.playlist.repository.PlaylistRepository;
+import com.efub.mavve.playlist.repository.PlaylistSongRepository;
 import com.efub.mavve.songs.domain.Song;
 import com.efub.mavve.songs.dto.response.SongResponse;
 import com.efub.mavve.songs.service.SongShareService;
@@ -31,6 +32,7 @@ import static com.efub.mavve.songs.service.spotify.SearchType.playlist;
 public class PlaylistService {
 
     private final PlaylistRepository playlistRepository;
+    private final PlaylistSongRepository playlistSongRepository;
     private final SongShareService songShareService;
     private final PlaylistSongService playlistSongService;
 
@@ -114,8 +116,9 @@ public class PlaylistService {
                 : songShareService.saveSongBySpotifySongId(spotifySongId, user);
         // 저장된 노래를 playlist에 추가
         playlist.addSong(newSong);
+        PlaylistSong playlistSong = playlistSongRepository.findByPlaylistAndSong(playlist, newSong).orElseThrow(() -> new MavveException(ExceptionCode.INTERNAL_SERVER_ERROR));
         // 해당 노래에 대한 정보를 return
-        return SongResponse.fromSongEntity(newSong);
+        return SongResponse.fromSongEntity(playlistSong, newSong);
     }
 
     @Transactional
