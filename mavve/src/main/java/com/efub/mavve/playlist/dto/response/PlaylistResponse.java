@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public record PlaylistResponse(Long playlistId,
-                               Long userId,
+                               String username,
                                String name,
                                String playImageUrl,
                                LocalDateTime createdAt,
@@ -16,12 +16,12 @@ public record PlaylistResponse(Long playlistId,
 
     public static PlaylistResponse from(Playlist playlist) {
         List<SongResponse> songResponses = playlist.getPlaylistSongs().stream()
-                .map(playlistSong -> SongResponse.fromSongEntity(playlistSong.getSong()))
+                .map(playlistSong -> SongResponse.fromSongEntity(playlistSong, playlistSong.getSong()))
                 .collect(Collectors.toList());
 
         return new PlaylistResponse(
                 playlist.getPlaylistId(),
-                playlist.getUser().getUserId(),
+                playlist.getUser().getUsername(),
                 playlist.getName(),
                 playlist.getPlayImageUrl(),
                 playlist.getCreatedAt(),
