@@ -8,6 +8,7 @@ import com.efub.mavve.auth.dto.response.SpotifyRedirctUri;
 import com.efub.mavve.auth.dto.response.SpotifyUserInfoResponse;
 import com.efub.mavve.auth.dto.response.UserInfoResponse;
 import com.efub.mavve.auth.repository.UserRepository;
+import com.efub.mavve.auth.service.cookies.CookieUtil;
 import com.efub.mavve.auth.service.jwt.JwtProvider;
 import com.efub.mavve.auth.service.jwt.JwtResolver;
 import com.efub.mavve.auth.service.jwt.TokenService;
@@ -15,7 +16,6 @@ import com.efub.mavve.auth.service.jwt.SpotifyTokenService;
 import com.efub.mavve.auth.service.oauth.OauthClient;
 import com.efub.mavve.global.exception.ExceptionCode;
 import com.efub.mavve.global.exception.MavveException;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -77,12 +77,7 @@ public class AuthService {
         long remainingTime = jwtResolver.getRemainingTime(originAccessToken);
         tokenService.registerBlackList(originAccessToken, remainingTime);
 
-        Cookie cookie = new Cookie("refresh_token", null);
-        cookie.setMaxAge(0);
-        cookie.setPath("/");
-        cookie.setHttpOnly(true);
-        cookie.setSecure(false); // 개발 중에만
-        response.addCookie(cookie);
+        CookieUtil.deleteCookie(response, "refresh_token");
     }
 
     @Transactional
@@ -153,19 +148,10 @@ public class AuthService {
         refreshTokenService.deleteRefreshToken(user.getUserId().toString());
         refreshTokenService.saveRefreshToken(user.getUserId().toString(), refreshToken, REFRESH_EXPIRE);
 
-        Cookie cookie = saveRefreshTokenCookie(refreshToken);
-        response.addCookie(cookie);
+        CookieUtil.addCookie(response, "refresh_token", refreshToken, (int) (REFRESH_EXPIRE / 1000));
         response.setHeader("Authorization", "Bearer " + accessToken);
     }
 
-    private Cookie saveRefreshTokenCookie(String refreshToken){
-        Cookie refreshTokenCookie = new Cookie("refresh_token", refreshToken);
-        refreshTokenCookie.setPath("/");
-        refreshTokenCookie.setHttpOnly(true);
-        refreshTokenCookie.setSecure(false); // 개발 중에만
-        refreshTokenCookie.setMaxAge((int) (REFRESH_EXPIRE / 1000));
-        return refreshTokenCookie;
-    }
 
     private boolean existedBySpotifyUserId(String spotifyUserId){
         return userRepository.existsBySpotifyUserId(spotifyUserId);
