@@ -81,6 +81,7 @@ public class AuthService {
         cookie.setMaxAge(0);
         cookie.setPath("/");
         cookie.setHttpOnly(true);
+        cookie.setSecure(false); // 개발 중에만
         response.addCookie(cookie);
     }
 
@@ -161,7 +162,7 @@ public class AuthService {
         Cookie refreshTokenCookie = new Cookie("refresh_token", refreshToken);
         refreshTokenCookie.setPath("/");
         refreshTokenCookie.setHttpOnly(true);
-        refreshTokenCookie.setSecure(true);
+        refreshTokenCookie.setSecure(false); // 개발 중에만
         refreshTokenCookie.setMaxAge((int) (REFRESH_EXPIRE / 1000));
         return refreshTokenCookie;
     }
