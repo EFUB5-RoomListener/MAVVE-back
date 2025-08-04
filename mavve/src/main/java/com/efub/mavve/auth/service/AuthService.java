@@ -152,6 +152,7 @@ public class AuthService {
         response.setHeader("Authorization", "Bearer " + accessToken);
     }
 
+
     private boolean existedBySpotifyUserId(String spotifyUserId){
         return userRepository.existsBySpotifyUserId(spotifyUserId);
     }
