@@ -33,8 +33,11 @@ export DB_URL=$(aws ssm get-parameter --name "/mavve/DB_URL" --with-decryption -
 export DB_USERNAME=$(aws ssm get-parameter --name "/mavve/DB_USERNAME" --with-decryption --query "Parameter.Value" --output text)
 export REDIS_HOST=$(aws ssm get-parameter --name "/mavve/REDIS_HOST" --with-decryption --query "Parameter.Value" --output text)
 export S3_BUCKET_NAME=$(aws ssm get-parameter --name "/mavve/S3_BUCKET_NAME" --with-decryption --query "Parameter.Value" --output text)
+export SPOTIFY_LOCAL_REDIRECT_URI=$(aws ssm get-parameter --name "/mavve/SPOTIFY_LOCAL_REDIRECT_URI" --with-decryption --query "Parameter.Value" --output text)
+export SPOTIFY_DEPLOY_REDIRECT_URI=$(aws ssm get-parameter --name "/mavve/SPOTIFY_DEPLOY_REDIRECT_URI" --with-decryption --query "Parameter.Value" --output text)
+export JWT_SECRET_KEY=$(aws ssm get-parameter --name "/mavve/JWT_SECRET_KEY" --with-decryption --query "Parameter.Value" --output text)
 
 
 DEPLOY_JAR=$DEPLOY_PATH$JAR_NAME
 echo ">>> 🚀 애플리케이션 실행: $DEPLOY_JAR" >> $LOG_PATH
-nohup java -jar $DEPLOY_JAR >> $LOG_PATH 2>> $ERROR_LOG_PATH &
+nohup java -Duser.timezone=Asia/Seoul -jar $DEPLOY_JAR >> $LOG_PATH 2>> $ERROR_LOG_PATH &
