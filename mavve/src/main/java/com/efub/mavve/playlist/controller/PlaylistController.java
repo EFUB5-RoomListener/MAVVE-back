@@ -40,11 +40,11 @@ public class PlaylistController {
         PlaylistResponse response = PlaylistResponse.from(playlist);
         return ResponseEntity.created(URI.create("/playlists/" + playlist.getPlaylistId())).body(response);
     }
-
+    
     // 플레이리스트 목록 조회
     @GetMapping("/me")
-    public ResponseEntity<PlaylistListResponse> getAllPlaylist() {
-        return ResponseEntity.ok(playlistService.getAllPlaylists());
+    public ResponseEntity<PlaylistListResponse> getAllPlaylist(@AuthenticationPrincipal User user) {
+        return ResponseEntity.ok(playlistService.getAllPlaylists(user));
     }
 
     // 플레이리스트 상세 조회
