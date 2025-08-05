@@ -83,8 +83,8 @@ public class RoomController {
 
     // 좋아요 순으로 TOP5 공개된 방 조회
     @GetMapping("/like")
-    public ResponseEntity<RoomListResponse> getLikeListRoom(@AuthenticationPrincipal User user){
-        RoomListResponse response = roomService.getLikeListRoom(user);
+    public ResponseEntity<RoomHotResponse> getLikeListRoom(@AuthenticationPrincipal User user){
+        RoomHotResponse response = roomService.getLikeListRoom(user);
         return ResponseEntity.ok(response);
     }
 
