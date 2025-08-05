@@ -101,7 +101,7 @@ public class DiaryService {
     }
 
     // 하루가 지나면 모든 일기 삭제
-    @Scheduled(cron = "0 0 0 * * *")
+    @Scheduled(cron = "0 0 15 * * *", zone = "UTC") // 한국시간 자정 == UTC 시간으로 오후 3시
     @Transactional
     @Async
     public void deleteOldDiaries() {
