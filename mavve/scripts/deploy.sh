@@ -36,6 +36,7 @@ export S3_BUCKET_NAME=$(aws ssm get-parameter --name "/mavve/S3_BUCKET_NAME" --w
 export SPOTIFY_LOCAL_REDIRECT_URI=$(aws ssm get-parameter --name "/mavve/SPOTIFY_LOCAL_REDIRECT_URI" --with-decryption --query "Parameter.Value" --output text)
 export SPOTIFY_DEPLOY_REDIRECT_URI=$(aws ssm get-parameter --name "/mavve/SPOTIFY_DEPLOY_REDIRECT_URI" --with-decryption --query "Parameter.Value" --output text)
 export JWT_SECRET_KEY=$(aws ssm get-parameter --name "/mavve/JWT_SECRET_KEY" --with-decryption --query "Parameter.Value" --output text)
+export FRONTEND_DOMAIN=$(aws ssm get-parameter --name "/mavve/FRONTEND_DOMAIN" --with-decryption --query "Parameter.Value" --output text)
 
 
 DEPLOY_JAR=$DEPLOY_PATH$JAR_NAME
