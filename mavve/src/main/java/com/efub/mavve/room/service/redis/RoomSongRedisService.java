@@ -149,6 +149,17 @@ public class RoomSongRedisService {
         }
     }
 
+    // 현재 재생중인 노래 없으면 첫 노래 반환
+    public SongRedis getCurrentOrFirstSong(Long roomId) {
+        CurrentSongSummary current = getCurrentSong(roomId);
+        SongRedis song = current.getSong();
+        if (song == null) {
+            song = getFirstSongInRoom(roomId);
+        }
+        return song;
+    }
+
+
     // 노래 id용 UUID값 생성
     public static String createUUID(){
         return UUID.randomUUID().toString();
