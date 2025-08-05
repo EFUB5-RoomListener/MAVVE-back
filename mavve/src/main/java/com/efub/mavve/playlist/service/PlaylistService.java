@@ -54,11 +54,17 @@ public class PlaylistService {
 
     // 플레이리스트 목록 조회
     @Transactional(readOnly = true)
-    public PlaylistListResponse getAllPlaylists() {
-        List<PlaylistSummary> playlistSummaries = playlistRepository.findByOrderByPlaylistIdDesc().stream()
-                .map(PlaylistSummary::from).toList();
+    public PlaylistListResponse getAllPlaylists(User user) {
+        List<PlaylistSummary> playlistSummaries = playlistRepository
+                .findByUserOrderByPlaylistIdDesc(user)
+                .stream()
+                .map(PlaylistSummary::from)
+                .toList();
+
         return new PlaylistListResponse(playlistSummaries);
     }
+
+
 
     // 플레이리스트 상세 조회
     @Transactional(readOnly = true)

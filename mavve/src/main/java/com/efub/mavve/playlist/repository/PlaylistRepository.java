@@ -13,6 +13,7 @@ import java.util.Optional;
 public interface PlaylistRepository extends JpaRepository<Playlist, Long> {
     Playlist findByPlaylistId(Long playlistId);
     boolean existsByName(String name);
-    List<Playlist> findByOrderByPlaylistIdDesc();
+    List<Playlist> findByUserOrderByPlaylistIdDesc(User user);
     List<Playlist> findByUserAndNameContainingIgnoreCaseOrderByCreatedAtDesc(User user, String keyword);
 }
+
