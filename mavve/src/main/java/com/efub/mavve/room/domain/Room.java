@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import static lombok.AccessLevel.PROTECTED;
@@ -46,6 +47,15 @@ public class Room {
 
     @CreatedDate
     private LocalDateTime createdAt;
+
+    @OneToMany(mappedBy = "room", orphanRemoval = true)
+    private List<RoomChat> roomChats = new ArrayList<>();
+
+    @OneToMany(mappedBy = "room", orphanRemoval = true)
+    private List<RoomLike> roomLikes = new ArrayList<>();
+
+    @OneToMany(mappedBy = "room", orphanRemoval = true)
+    private List<RoomPlaylist> roomPlaylists = new ArrayList<>();
 
 
     // 빌더
