@@ -12,10 +12,12 @@ import com.efub.mavve.playlist.dto.response.PlaylistListResponse;
 import com.efub.mavve.playlist.dto.response.PlaylistResponse;
 import com.efub.mavve.playlist.dto.summary.PlaylistSummary;
 import com.efub.mavve.playlist.repository.PlaylistRepository;
+import com.efub.mavve.playlist.repository.PlaylistSongRepository;
 import com.efub.mavve.songs.domain.Song;
 import com.efub.mavve.songs.dto.response.SongResponse;
 import com.efub.mavve.songs.service.SongShareService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,9 +28,11 @@ import static com.efub.mavve.songs.service.spotify.SearchType.playlist;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class PlaylistService {
 
     private final PlaylistRepository playlistRepository;
+    private final PlaylistSongRepository playlistSongRepository;
     private final SongShareService songShareService;
     private final PlaylistSongService playlistSongService;
 
@@ -50,11 +54,17 @@ public class PlaylistService {
 
     // 플레이리스트 목록 조회
     @Transactional(readOnly = true)
-    public PlaylistListResponse getAllPlaylists() {
-        List<PlaylistSummary> playlistSummaries = playlistRepository.findByOrderByPlaylistIdDesc().stream()
-                .map(PlaylistSummary::from).toList();
+    public PlaylistListResponse getAllPlaylists(User user) {
+        List<PlaylistSummary> playlistSummaries = playlistRepository
+                .findByUserOrderByPlaylistIdDesc(user)
+                .stream()
+                .map(PlaylistSummary::from)
+                .toList();
+
         return new PlaylistListResponse(playlistSummaries);
     }
+
+
 
     // 플레이리스트 상세 조회
     @Transactional(readOnly = true)
@@ -112,15 +122,16 @@ public class PlaylistService {
                 : songShareService.saveSongBySpotifySongId(spotifySongId, user);
         // 저장된 노래를 playlist에 추가
         playlist.addSong(newSong);
+        PlaylistSong playlistSong = playlistSongRepository.findByPlaylistAndSong(playlist, newSong).orElseThrow(() -> new MavveException(ExceptionCode.INTERNAL_SERVER_ERROR));
         // 해당 노래에 대한 정보를 return
-        return SongResponse.fromSongEntity(newSong);
+        return SongResponse.fromSongEntity(playlistSong, newSong);
     }
 
     @Transactional
-    public void deleteSongInPlaylist(User user, Long playlistId, Long songId) {
+    public void deleteSongInPlaylist(User user, Long playlistId, String spotifySongId) {
         Playlist playlist = getPlaylistOrThrow(playlistId);
         validatePlaylistOwner(playlist, user);
-        Song song = songShareService.getSongBySongId(songId);
+        Song song = songShareService.getSongBySpotifySongId(spotifySongId);
         PlaylistSong target = playlistSongService.getPlaylistSongByPlaylistAndSong(playlist, song);
         playlist.removeSong(song, target);
     }

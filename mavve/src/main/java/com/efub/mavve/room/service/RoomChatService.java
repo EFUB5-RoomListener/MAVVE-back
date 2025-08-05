@@ -1,6 +1,8 @@
 package com.efub.mavve.room.service;
 
 import com.efub.mavve.auth.domain.User;
+import com.efub.mavve.global.exception.ExceptionCode;
+import com.efub.mavve.global.exception.MavveException;
 import com.efub.mavve.room.domain.Room;
 import com.efub.mavve.room.domain.RoomChat;
 import com.efub.mavve.room.dto.response.ChatListResponse;
@@ -17,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.security.Principal;
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 
@@ -28,7 +31,7 @@ public class RoomChatService {
     private final RoomService roomService;
     private final PrincipalUtil principalUtil;
 
-    private final static int CHATLIST_SIZE = 2; // 채팅 한 번에 보여줄 수. 추후 조정 예정
+    private final static int CHATLIST_SIZE = 15; // 채팅 한 번에 보여줄 수.
 
     @Transactional
     public ChatResponsePayload createAndSendMessage(Long roomCode, ChatRequestPayload request, Principal principal) {
@@ -42,9 +45,19 @@ public class RoomChatService {
 
     @Transactional(readOnly = true)
     public ChatListResponse getAllChats(Long roomId, Long lastChatId) {
+        LocalDateTime lastChatCreatedAt = null;
+        if (lastChatId != null) {
+            RoomChat chat = getChatById(lastChatId); // 이건 존재하는지 체크하는 용도
+            lastChatCreatedAt = chat.getCreatedAt();
+        }
         Pageable pageable = PageRequest.of(0, CHATLIST_SIZE);
-        List<ChatSummary> chatList = roomChatRepository.findChatsByRoomId(roomId, lastChatId, pageable);
+        List<ChatSummary> chatList = roomChatRepository.findChatsByRoomId(roomId, lastChatCreatedAt, pageable);
         Collections.reverse(chatList);
         return new ChatListResponse(chatList);
+    }
+
+    private RoomChat getChatById(Long roomId){
+        return roomChatRepository.findById(roomId)
+                .orElseThrow(() -> new MavveException(ExceptionCode.CHAT_NOT_FOUND));
     }
 }

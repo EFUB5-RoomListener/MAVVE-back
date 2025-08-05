@@ -3,10 +3,12 @@ package com.efub.mavve.auth.service;
 import com.efub.mavve.auth.domain.User;
 import com.efub.mavve.auth.dto.request.SpotifyCodeRequest;
 import com.efub.mavve.auth.dto.request.UserInfoRequest;
+import com.efub.mavve.auth.dto.response.SpotifyAccessTokenResponse;
 import com.efub.mavve.auth.dto.response.SpotifyRedirctUri;
 import com.efub.mavve.auth.dto.response.SpotifyUserInfoResponse;
 import com.efub.mavve.auth.dto.response.UserInfoResponse;
 import com.efub.mavve.auth.repository.UserRepository;
+import com.efub.mavve.auth.service.cookies.CookieUtil;
 import com.efub.mavve.auth.service.jwt.JwtProvider;
 import com.efub.mavve.auth.service.jwt.JwtResolver;
 import com.efub.mavve.auth.service.jwt.TokenService;
@@ -14,7 +16,6 @@ import com.efub.mavve.auth.service.jwt.SpotifyTokenService;
 import com.efub.mavve.auth.service.oauth.OauthClient;
 import com.efub.mavve.global.exception.ExceptionCode;
 import com.efub.mavve.global.exception.MavveException;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -70,17 +71,13 @@ public class AuthService {
     }
 
     @Transactional
-    public void logout(User user, String accessToken, HttpServletResponse response, String refreshToken) {
+    public void logout(User user, String accessToken, HttpServletResponse response) {
         refreshTokenService.deleteRefreshToken(user.getUserId().toString());
         String originAccessToken = accessToken.substring(7);
         long remainingTime = jwtResolver.getRemainingTime(originAccessToken);
         tokenService.registerBlackList(originAccessToken, remainingTime);
 
-        Cookie cookie = new Cookie("refreshToken", null);
-        cookie.setMaxAge(0);
-        cookie.setPath("/");
-        cookie.setHttpOnly(true);
-        response.addCookie(cookie);
+        CookieUtil.deleteCookie(response, "refresh_token");
     }
 
     @Transactional
@@ -99,6 +96,21 @@ public class AuthService {
 
         // accessToken과 refreshToken 재 발급
         sendTokens(user, response);
+    }
+
+    @Transactional
+    public SpotifyAccessTokenResponse getSpotifyAccessToken(User user) {
+        String userId = user.getUserId().toString();
+        String spotifyAccessToken = spotifyTokenService.getAccessToken(userId);
+        Long ttl = spotifyTokenService.getTtl(userId);
+
+        if(spotifyAccessToken == null || ttl == null || ttl < 60){
+            String refreshToken = spotifyTokenService.getRefreshToken(userId);
+            spotifyAccessToken = oauthClient.getReissueResponse(refreshToken).getAccess_token();
+            spotifyTokenService.saveAccessToken(userId, spotifyAccessToken);
+        }
+
+        return SpotifyAccessTokenResponse.builder().spotifyAccessToken(spotifyAccessToken).build();
     }
 
 
@@ -136,19 +148,10 @@ public class AuthService {
         refreshTokenService.deleteRefreshToken(user.getUserId().toString());
         refreshTokenService.saveRefreshToken(user.getUserId().toString(), refreshToken, REFRESH_EXPIRE);
 
-        Cookie cookie = saveRefreshTokenCookie(refreshToken);
-        response.addCookie(cookie);
+        CookieUtil.addCookie(response, "refresh_token", refreshToken, (int) (REFRESH_EXPIRE / 1000));
         response.setHeader("Authorization", "Bearer " + accessToken);
     }
 
-    private Cookie saveRefreshTokenCookie(String refreshToken){
-        Cookie refreshTokenCookie = new Cookie("refresh_token", refreshToken);
-        refreshTokenCookie.setPath("/");
-        refreshTokenCookie.setHttpOnly(true);
-        refreshTokenCookie.setSecure(true);
-        refreshTokenCookie.setMaxAge((int) (REFRESH_EXPIRE / 1000));
-        return refreshTokenCookie;
-    }
 
     private boolean existedBySpotifyUserId(String spotifyUserId){
         return userRepository.existsBySpotifyUserId(spotifyUserId);

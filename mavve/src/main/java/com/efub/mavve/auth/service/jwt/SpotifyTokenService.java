@@ -5,6 +5,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
+import java.util.concurrent.TimeUnit;
 
 @Service
 @RequiredArgsConstructor
@@ -15,7 +16,7 @@ public class SpotifyTokenService {
 
     public void saveAccessToken(String userId, String accessToken) {
         redisTemplate.opsForValue()
-                .set(ACCESSPRIFIX + userId, accessToken);
+                .set(ACCESSPRIFIX + userId, accessToken, Duration.ofSeconds(3600));
     }
 
     public void saveRefreshToken(String userId, String refreshToken) {
@@ -26,6 +27,8 @@ public class SpotifyTokenService {
     public String getAccessToken(String userId) {
         return redisTemplate.opsForValue().get(ACCESSPRIFIX + userId);
     }
+
+    public Long getTtl(String userId) {return redisTemplate.getExpire(ACCESSPRIFIX + userId, TimeUnit.SECONDS);}
 
     public String getRefreshToken(String userId) {
         return redisTemplate.opsForValue().get(REFRESHPRIFIX + userId);

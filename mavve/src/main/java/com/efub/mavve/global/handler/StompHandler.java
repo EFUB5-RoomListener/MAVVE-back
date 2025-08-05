@@ -5,6 +5,8 @@ import com.efub.mavve.auth.service.jwt.CustomUserDetails;
 import com.efub.mavve.auth.service.jwt.JwtResolver;
 import com.efub.mavve.auth.service.jwt.UserDetailsService;
 import com.efub.mavve.global.exception.CustomAuthenticationException;
+import com.efub.mavve.global.exception.ExceptionCode;
+import com.efub.mavve.global.exception.MavveException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.Ordered;
@@ -40,18 +42,19 @@ public class StompHandler implements ChannelInterceptor {
             try{
                 String bearerToken = accessor.getFirstNativeHeader("Authorization");
 
-                if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
-                    bearerToken = bearerToken.substring(7);
-                    String userId = jwtResolver.resolveAccessToken(bearerToken);
-
-                    CustomUserDetails userDetails = userDetailsService.loadUserByUsername(userId);
-                    User user = userDetails.getUser();
-
-                    Authentication authentication = new UsernamePasswordAuthenticationToken(user, null, userDetails.getAuthorities());
-                    accessor.setUser(authentication);
-                    SecurityContextHolder.getContext().setAuthentication(authentication);   //@AuthenticationPrincipal 어노테이션 사용
-                    log.info("websocket connect");
+                if (bearerToken == null && !bearerToken.startsWith("Bearer ")) {
+                    throw new MavveException(ExceptionCode.AUTH_TOKEN_EMPTY);
                 }
+                bearerToken = bearerToken.substring(7);
+                String userId = jwtResolver.resolveAccessToken(bearerToken);
+
+                CustomUserDetails userDetails = userDetailsService.loadUserByUsername(userId);
+                User user = userDetails.getUser();
+
+                Authentication authentication = new UsernamePasswordAuthenticationToken(user, null, userDetails.getAuthorities());
+                accessor.setUser(authentication);
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+                log.info("websocket connect");
             } catch (CustomAuthenticationException e) {
                 throw new MessagingException("STOMP 연결 실패: " + e.getMessage(), e);
             }

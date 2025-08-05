@@ -36,4 +36,7 @@ public enum ClientExceptionCode {
     REDIS_DELETE_ERROR,
     REDIS_DESERIALIZATION_ERROR,
     NO_SESSION_ID,
+
+    SPOTIFY_REISSUE_ERROR,
+    CHAT_NOT_FOUND,
 }

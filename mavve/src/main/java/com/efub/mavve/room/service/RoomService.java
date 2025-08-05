@@ -1,21 +1,25 @@
 package com.efub.mavve.room.service;
 
 import com.efub.mavve.auth.domain.User;
+import com.efub.mavve.auth.repository.UserRepository;
 import com.efub.mavve.global.exception.ExceptionCode;
 import com.efub.mavve.global.exception.MavveException;
 import com.efub.mavve.room.domain.Room;
+import com.efub.mavve.room.domain.RoomLike;
 import com.efub.mavve.room.dto.projection.RoomLikeCountProjection;
 import com.efub.mavve.room.dto.request.RoomCreateRequest;
 import com.efub.mavve.room.dto.request.RoomUpdateRequest;
 import com.efub.mavve.room.dto.response.RoomEnterResponse;
 import com.efub.mavve.room.dto.response.RoomListResponse;
 import com.efub.mavve.room.dto.response.RoomResponse;
+import com.efub.mavve.room.dto.response.RoomUserResponse;
+import com.efub.mavve.room.dto.summary.RoomUserSummary;
 import com.efub.mavve.room.payload.summary.CurrentSongSummary;
 import com.efub.mavve.room.payload.summary.SongRedis;
 import com.efub.mavve.room.repository.RoomRepository;
 import com.efub.mavve.room.service.redis.RoomSongRedisService;
 import com.efub.mavve.room.service.redis.RoomUserRedisService;
-import com.efub.mavve.room.service.websocket.RoomSongWebsocketService;
+import com.efub.mavve.room.service.websocket.RoomSongService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import com.efub.mavve.room.repository.RoomLikeRepository;
@@ -24,6 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -33,15 +38,19 @@ public class RoomService {
     private final RoomRepository roomRepository;
     private final RoomSongRedisService roomSongRedisService;
     private final RoomUserRedisService roomUserRedisService;
-    private final RoomSongWebsocketService roomSongWebsocketService;
+    private final RoomSongService roomSongService;
     private final RoomPlaylistService roomPlaylistService;
     private final RoomLikeRepository roomLikeRepository;
+    private final UserRepository userRepository;
+
+
 
     // 방 생성
     @Transactional
     public RoomResponse createRoom(RoomCreateRequest request, User user){
         Room room = roomRepository.save(request.toEntity(user));
-        return RoomResponse.from(room, 0);
+        String duration = getDuration(room);
+        return RoomResponse.from(room, 0, false, duration);
     }
 
     // 방 수정
@@ -55,8 +64,9 @@ public class RoomService {
         if(request.imageURL()!=null){room.changeImageURL(request.imageURL());}
         room.changeIsPublic(request.isPublic());
         int likeCount = roomLikeRepository.countByRoom(room);
+        String duration = getDuration(room);
 
-        return RoomResponse.from(room, likeCount);
+        return RoomResponse.from(room, likeCount, getLiked(room, user), duration);
     }
 
     // 방 삭제
@@ -69,13 +79,14 @@ public class RoomService {
 
     // 공개된 방 리스트 전체 조회
     @Transactional(readOnly = true)
-    public RoomListResponse getListRoom() {
+    public RoomListResponse getListRoom(User user) {
         List<Room> roomList = roomRepository.findAll();
 
         List<RoomResponse> responseList = roomList.stream().filter(Room::isPublic)
                 .map(room -> {
                     int likeCount = roomLikeRepository.countByRoom(room);
-                    return RoomResponse.from(room, likeCount);})
+                    String duration = getDuration(room);
+                    return RoomResponse.from(room, likeCount, getLiked(room, user), duration);})
                 .collect(Collectors.toList());
 
         return RoomListResponse.from(responseList);
@@ -89,7 +100,8 @@ public class RoomService {
         List<RoomResponse> responseList = roomList.stream()
                 .map(room -> {
                     int likeCount = roomLikeRepository.countByRoom(room);
-                    return RoomResponse.from(room, likeCount);})
+                    String duration = getDuration(room);
+                    return RoomResponse.from(room, likeCount, getLiked(room, user), duration);})
                 .collect(Collectors.toList());
 
         return RoomListResponse.from(responseList);
@@ -103,47 +115,51 @@ public class RoomService {
         List<RoomResponse> responseList = roomList.stream()
                 .map(room -> {
                     int likeCount = roomLikeRepository.countByRoom(room);
-                    return RoomResponse.from(room, likeCount);})
+                    String duration = getDuration(room);
+                    return RoomResponse.from(room, likeCount, getLiked(room, user), duration);})
                 .collect(Collectors.toList());
         return RoomListResponse.from(responseList);
     }
 
     // 조회순으로 공개된 방 리스트 Top5 조회
     @Transactional(readOnly = true)
-    public RoomListResponse getHotListRoom(){
+    public RoomListResponse getHotListRoom(User user){
         List<Room> roomList = roomRepository.findTop5ByIsPublicTrueOrderByViewCountDesc();
 
         List<RoomResponse> responseList = roomList.stream()
                 .map(room -> {
                     int likeCount = roomLikeRepository.countByRoom(room);
-                    return RoomResponse.from(room, likeCount);})
+                    String duration = getDuration(room);
+                    return RoomResponse.from(room, likeCount, getLiked(room, user), duration);})
                 .collect(Collectors.toList());
         return RoomListResponse.from(responseList);
     }
 
     // 좋아요 순으로 TOP5 공개된 방 조회
     @Transactional(readOnly = true)
-    public RoomListResponse getLikeListRoom(){
+    public RoomListResponse getLikeListRoom(User user){
         List<RoomLikeCountProjection> projection = roomRepository.findTop5ByIsPublicTrueOrderByLikeCountDesc();
 
         List<RoomResponse> responseList = projection.stream()
                 .map(proj -> {
                     Room room = findByRoomId(proj.getRoomId());
                     int likeCount = roomLikeRepository.countByRoom(room);
-                    return RoomResponse.from(room, likeCount);})
+                    String duration = getDuration(room);
+                    return RoomResponse.from(room, likeCount, getLiked(room, user), duration);})
                 .collect(Collectors.toList());
         return RoomListResponse.from(responseList);
     }
 
     // 방 검색
     @Transactional(readOnly = true)
-    public RoomListResponse searchRoom(String keyword){
+    public RoomListResponse searchRoom(String keyword, User user){
         List<Room> roomList = roomRepository.findByRoomNameContainingIgnoreCaseAndIsPublicTrueOrderByCreatedAtDesc(keyword);
 
         List<RoomResponse> responseList = roomList.stream()
                 .map(room -> {
                     int likeCount = roomLikeRepository.countByRoom(room);
-                    return RoomResponse.from(room, likeCount);})
+                    String duration = getDuration(room);
+                    return RoomResponse.from(room, likeCount, getLiked(room, user), duration);})
                 .collect(Collectors.toList());
         return RoomListResponse.from(responseList);
     }
@@ -162,6 +178,29 @@ public class RoomService {
         }
     }
 
+    // 노래 총 재생시간 00:00:00 형태 String으로 변환
+    private String getTotalDuration(List<SongRedis> songs){
+        int totalMillis = songs.stream()
+                .mapToInt(SongRedis::getDuration)
+                .sum();
+        int totalSeconds = totalMillis / 1000;
+
+        int hours = totalSeconds / 3600;
+        int minutes = (totalSeconds % 3600) / 60;
+        int seconds = totalSeconds % 60;
+
+        return String.format("%02d:%02d:%02d", hours, minutes, seconds);
+    }
+    // Duration 가져오기
+    public String getDuration(Room room){
+        if (!roomSongRedisService.hasSongs(room.getRoomId())) {roomPlaylistService.addSongsByPlaylist(room.getRoomId());}
+        List<SongRedis> songList = roomSongRedisService.getAllSongsInRoom(room.getRoomId());
+        log.info("song count : {}", songList.size());
+        return getTotalDuration(songList);
+    }
+
+
+
     // 방 입장 시 방 정보 + 플레이리스트 + 현재 재생중인 노래 전달
     @Transactional(readOnly = true)
     public RoomEnterResponse getRoomEnterInfo(Long roomId) {
@@ -174,9 +213,19 @@ public class RoomService {
         return RoomEnterResponse.from(room, songList, duration, currentSong);
     }
 
+    // 좋아요 눌렀는지 확인
+    @Transactional(readOnly = true)
+    public boolean getLiked(Room room, User user){
+        Optional<RoomLike> existingLike = roomLikeRepository.findByUserAndRoom(user, room);
+
+        if (existingLike.isPresent()) {return true;}
+        else {return false;}
+    }
+
     // 첫 입장자인 경우 처리
     private CurrentSongSummary handleFirstEnter(Long roomId) {
-        if (!roomUserRedisService.hasUsers(roomId)) {
+        // 입장자 없음 + 현재 저장되어 있는 노래가 없는 경우 첫 노래부터 재생 시작
+        if (!roomUserRedisService.hasUsers(roomId) && !roomSongRedisService.hasCurrentSong(roomId)) {
             // 방 생성된 뒤 플레이리스트의 노래들 redis에 저장
             if(!roomSongRedisService.hasSongs(roomId)){
                 roomPlaylistService.addSongsByPlaylist(roomId);
@@ -186,14 +235,10 @@ public class RoomService {
             SongRedis firstSong = roomSongRedisService.getFirstSongInRoom(roomId);
             if (firstSong != null) {
                 log.info("first user!!");
-                LocalDateTime startTime = LocalDateTime.now();
-
-                // 현재 노래 저장 및 다음 노래 스케쥴링
-                roomSongRedisService.addCurrentSong(roomId, firstSong, startTime);
-                roomSongWebsocketService.scheduleNextSong(roomId, firstSong);
+                LocalDateTime startTime = roomSongService.startFirstSong(roomId, firstSong);
                 return CurrentSongSummary.from(firstSong, startTime);
-            } else {
-                throw new MavveException(ExceptionCode.SONG_LIST_EMPTY);
+            } else{
+                return null;    // 저장된 노래 시스트가 없을 경우 null 반환
             }
         }
         return roomSongRedisService.getCurrentSong(roomId);
@@ -213,5 +258,16 @@ public class RoomService {
         if(hours > 0) return String.format("%d시간 %d분 %d초", hours, minutes, seconds);
         else if (minutes > 0) return String.format("%d분 %d초", minutes, seconds);
         else return String.format("%d초", seconds);
+    }
+
+
+    public RoomUserResponse getUserInRoom(Long roomId) {
+        List<String> userIds = roomUserRedisService.getAllUsers(roomId);
+        List<RoomUserSummary> users = userIds.stream().map(userId -> {
+            User user = userRepository.findByUserId(Long.parseLong(userId))
+                    .orElseThrow(() -> new MavveException(ExceptionCode.USER_NOT_FOUND));
+            return RoomUserSummary.from(user);
+        }).collect(Collectors.toList());
+        return RoomUserResponse.from(users);
     }
 }

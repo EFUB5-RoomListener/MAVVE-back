@@ -8,7 +8,9 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import java.sql.SQLOutput;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,6 +22,7 @@ import java.util.List;
 @Getter
 @Table(name = "playlists")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@EntityListeners(AuditingEntityListener.class)
 public class Playlist {
 
     @Id
@@ -34,7 +37,7 @@ public class Playlist {
 
     private String playImageUrl;
 
-    @OneToMany(mappedBy = "playlist", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "playlist", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PlaylistSong> playlistSongs = new ArrayList<>();
 
     @CreatedDate
@@ -62,6 +65,25 @@ public class Playlist {
     public void removeSong(Song song, PlaylistSong playlistSong){
         this.playlistSongs.remove(playlistSong);
         song.getPlaylistSongs().remove(playlistSong);
+    }
+
+    public int getSongCount() {
+        return this.playlistSongs.size();
+    }
+
+    public int getTotalDurationSeconds() {
+        return playlistSongs.stream()
+                .filter(ps -> ps.getSong() != null)
+                .mapToInt(ps -> ps.getSong().getDuration() / 1000)
+                .sum();
+    }
+
+    public String getFormattedTotalDuration() {
+        int totalSeconds = getTotalDurationSeconds();
+        int hours = totalSeconds / 3600;
+        int minutes = (totalSeconds % 3600) / 60;
+        int seconds = totalSeconds % 60;
+        return String.format("%02d:%02d:%02d", hours, minutes, seconds);
     }
 
 }
