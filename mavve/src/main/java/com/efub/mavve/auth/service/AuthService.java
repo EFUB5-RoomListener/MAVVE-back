@@ -45,7 +45,8 @@ public class AuthService {
     @Transactional
     public void loginOrRegisterUser(SpotifyCodeRequest request, HttpServletResponse response){
         String code = request.getCode();
-        SpotifyUserInfoResponse userInfoResponse = oauthClient.requestOauthInfo(code);
+        String environment = request.getEnvironment();
+        SpotifyUserInfoResponse userInfoResponse = oauthClient.requestOauthInfo(code, environment);
 
         if(existedBySpotifyUserId(userInfoResponse.getId())){
             // 존재하는 유저이므로 로그인

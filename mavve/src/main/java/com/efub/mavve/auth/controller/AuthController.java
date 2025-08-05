@@ -22,7 +22,8 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/login")
-    public ResponseEntity<Void> loginOrRegister(@RequestBody @Valid SpotifyCodeRequest request, HttpServletResponse response) {
+    public ResponseEntity<Void> loginOrRegister(@RequestBody @Valid SpotifyCodeRequest request,
+                                                HttpServletResponse response) {
         authService.loginOrRegisterUser(request, response);
         return ResponseEntity.ok().build();
     }
