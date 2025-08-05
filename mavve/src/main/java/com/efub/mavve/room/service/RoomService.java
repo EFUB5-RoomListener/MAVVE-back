@@ -9,10 +9,8 @@ import com.efub.mavve.room.domain.RoomLike;
 import com.efub.mavve.room.dto.projection.RoomLikeCountProjection;
 import com.efub.mavve.room.dto.request.RoomCreateRequest;
 import com.efub.mavve.room.dto.request.RoomUpdateRequest;
-import com.efub.mavve.room.dto.response.RoomEnterResponse;
-import com.efub.mavve.room.dto.response.RoomListResponse;
-import com.efub.mavve.room.dto.response.RoomResponse;
-import com.efub.mavve.room.dto.response.RoomUserResponse;
+import com.efub.mavve.room.dto.response.*;
+import com.efub.mavve.room.dto.summary.RoomHotSummary;
 import com.efub.mavve.room.dto.summary.RoomUserSummary;
 import com.efub.mavve.room.payload.summary.CurrentSongSummary;
 import com.efub.mavve.room.payload.summary.SongRedis;
@@ -137,17 +135,16 @@ public class RoomService {
 
     // 좋아요 순으로 TOP5 공개된 방 조회
     @Transactional(readOnly = true)
-    public RoomListResponse getLikeListRoom(User user){
+    public RoomHotResponse getLikeListRoom(User user){
         List<RoomLikeCountProjection> projection = roomRepository.findTop5ByIsPublicTrueOrderByLikeCountDesc();
 
-        List<RoomResponse> responseList = projection.stream()
+        List<RoomHotSummary> responseList = projection.stream()
                 .map(proj -> {
                     Room room = findByRoomId(proj.getRoomId());
-                    int likeCount = roomLikeRepository.countByRoom(room);
-                    String duration = getDuration(room);
-                    return RoomResponse.from(room, likeCount, getLiked(room, user), duration);})
+                    SongRedis song = roomSongRedisService.getCurrentOrFirstSong(room.getRoomId());
+                    return RoomHotSummary.from(room, song);})
                 .collect(Collectors.toList());
-        return RoomListResponse.from(responseList);
+        return new RoomHotResponse(responseList);
     }
 
     // 방 검색
