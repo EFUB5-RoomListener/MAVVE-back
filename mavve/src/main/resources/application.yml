@@ -53,6 +53,8 @@ spotify:
   reissue-uri: https://accounts.spotify.com/api/token
   playlist-id: 7qaj9zCKCQVMnxEkzWi2Sx
   get-track-in-playlist-uri: https://api.spotify.com/v1/playlists
+frontend:
+  domain-uri: ${frontend.domain-uri}
 server:
   tomcat:
     uri-encoding: UTF-8
