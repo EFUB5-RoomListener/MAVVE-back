@@ -13,8 +13,8 @@ public class OauthClient {
     private final RestClient restClient;
     private final OauthProperties oauthProperties;
 
-    public SpotifyUserInfoResponse requestOauthInfo(String code){
-        SpotifyTokenResponse spotifyTokenResponse = requestToken(code);
+    public SpotifyUserInfoResponse requestOauthInfo(String code, String environment){
+        SpotifyTokenResponse spotifyTokenResponse = requestToken(code, environment);
         String userInfoRequestUri = oauthProperties.getUserInfoUri();
         String headerName = "Authorization";
         String headerValue = "Bearer " + spotifyTokenResponse.getAccess_token();
@@ -28,9 +28,9 @@ public class OauthClient {
                 spotifyUserInfoRaw.getDisplay_name(), spotifyUserInfoRaw.getEmail(), spotifyUserInfoRaw.getCountry(), spotifyTokenResponse);
     }
 
-    private SpotifyTokenResponse requestToken(String code){
+    private SpotifyTokenResponse requestToken(String code, String environment){
         String tokenRequestUri = oauthProperties.getTokenRequestUri();
-        MultiValueMap<String, String> tokenRequestBody = oauthProperties.createTokenRequestBody(code);
+        MultiValueMap<String, String> tokenRequestBody = oauthProperties.createTokenRequestBody(code, environment);
 
         return restClient.post()
                 .uri(tokenRequestUri)

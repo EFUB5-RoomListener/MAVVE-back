@@ -9,4 +9,5 @@ import lombok.RequiredArgsConstructor;
 public class SpotifyCodeRequest {
     @NotBlank(message = "인가코드가 필요합니다.")
     private final String code;
+    private final String environment;
 }

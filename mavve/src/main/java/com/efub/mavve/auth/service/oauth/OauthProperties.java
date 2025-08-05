@@ -19,7 +19,8 @@ public class OauthProperties {
     private final String userInfoUri;
     @Getter
     private final String reissueUri;
-    private final String redirectUri;
+    private final String localRedirectUri;
+    private final String deployRedirectUri;
     private final String authorizeUri;
     private final String clientId;
     private final String clientSecret;
@@ -28,14 +29,16 @@ public class OauthProperties {
             @Value("${spotify.token-uri}") String tokenRequestUri,
             @Value("${spotify.user-info-uri}") String userInfoUri,
             @Value("${spotify.client-id}") String clientId,
-            @Value("${spotify.redirect-uri}") String redirectUri,
+            @Value("${spotify.redirect-uri.local}") String localRedirectUri,
+            @Value("${spotify.redirect-uri.deploy}") String deployRedirectUri,
             @Value("${spotify.auth-uri}") String authorizeUri,
             @Value("${spotify.client-secret}") String clientSecret,
             @Value("${spotify.reissue-uri}") String reissueUri) {
         this.tokenRequestUri = tokenRequestUri;
         this.userInfoUri = userInfoUri;
         this.clientId = clientId;
-        this.redirectUri = redirectUri;
+        this.localRedirectUri = localRedirectUri;
+        this.deployRedirectUri = deployRedirectUri;
         this.authorizeUri = authorizeUri;
         this.clientSecret = clientSecret;
         this.reissueUri = reissueUri;
@@ -45,12 +48,16 @@ public class OauthProperties {
         return UriComponentsBuilder.fromUriString(authorizeUri)
                 .queryParam("client_id", clientId)
                 .queryParam("response_type", "code")
-                .queryParam("redirect_uri", redirectUri)
+                .queryParam("redirect_uri", localRedirectUri)
                 .queryParam("scope", "user-read-private user-read-email streaming user-read-playback-state user-modify-playback-state user-read-currently-playing")
                 .build().toUriString();
     }
 
-    public MultiValueMap<String, String> createTokenRequestBody(String code){
+    public MultiValueMap<String, String> createTokenRequestBody(String code, String environment){
+        String redirectUri = deployRedirectUri;
+        if(environment.equals("dev")){
+            redirectUri = localRedirectUri;
+        }
         MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
         map.add("grant_type", "authorization_code");
         map.add("code", code);
