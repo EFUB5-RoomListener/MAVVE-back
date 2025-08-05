@@ -2,7 +2,6 @@ package com.efub.mavve.auth.service.oauth;
 
 import com.efub.mavve.auth.dto.response.*;
 import lombok.RequiredArgsConstructor;
-import org.springframework.core.env.Environment;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.util.MultiValueMap;
@@ -13,7 +12,6 @@ import org.springframework.web.client.RestClient;
 public class OauthClient {
     private final RestClient restClient;
     private final OauthProperties oauthProperties;
-    private final Environment environment;
 
     public SpotifyUserInfoResponse requestOauthInfo(String code, String environment){
         SpotifyTokenResponse spotifyTokenResponse = requestToken(code, environment);

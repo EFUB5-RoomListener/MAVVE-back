@@ -19,7 +19,6 @@ import com.efub.mavve.global.exception.MavveException;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,7 +37,6 @@ public class AuthService {
     private final long REFRESH_EXPIRE = 1000L * 60 * 60 * 24 * 14;
     private final JwtResolver jwtResolver;
     private final TokenService tokenService;
-    private final Environment environment;
 
     public SpotifyRedirctUri getRedirctUri() {
         return SpotifyRedirctUri.of(oauthClient.getRedirectUri());
