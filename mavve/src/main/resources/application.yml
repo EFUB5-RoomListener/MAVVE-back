@@ -54,7 +54,7 @@ spotify:
   playlist-id: 7qaj9zCKCQVMnxEkzWi2Sx
   get-track-in-playlist-uri: https://api.spotify.com/v1/playlists
 frontend:
-  domain-uri: ${frontend.domain-uri}
+  domain-uri: ${FRONTEND_DOMAIN}
 server:
   tomcat:
     uri-encoding: UTF-8
