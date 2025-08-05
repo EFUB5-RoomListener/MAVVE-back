@@ -2,6 +2,7 @@ package com.efub.mavve.auth.service.oauth;
 
 import com.efub.mavve.auth.dto.response.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.env.Environment;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.util.MultiValueMap;
@@ -12,9 +13,10 @@ import org.springframework.web.client.RestClient;
 public class OauthClient {
     private final RestClient restClient;
     private final OauthProperties oauthProperties;
+    private final Environment environment;
 
-    public SpotifyUserInfoResponse requestOauthInfo(String code){
-        SpotifyTokenResponse spotifyTokenResponse = requestToken(code);
+    public SpotifyUserInfoResponse requestOauthInfo(String code, String environment){
+        SpotifyTokenResponse spotifyTokenResponse = requestToken(code, environment);
         String userInfoRequestUri = oauthProperties.getUserInfoUri();
         String headerName = "Authorization";
         String headerValue = "Bearer " + spotifyTokenResponse.getAccess_token();
@@ -28,9 +30,9 @@ public class OauthClient {
                 spotifyUserInfoRaw.getDisplay_name(), spotifyUserInfoRaw.getEmail(), spotifyUserInfoRaw.getCountry(), spotifyTokenResponse);
     }
 
-    private SpotifyTokenResponse requestToken(String code){
+    private SpotifyTokenResponse requestToken(String code, String environment){
         String tokenRequestUri = oauthProperties.getTokenRequestUri();
-        MultiValueMap<String, String> tokenRequestBody = oauthProperties.createTokenRequestBody(code);
+        MultiValueMap<String, String> tokenRequestBody = oauthProperties.createTokenRequestBody(code, environment);
 
         return restClient.post()
                 .uri(tokenRequestUri)

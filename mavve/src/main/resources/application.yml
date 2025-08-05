@@ -27,7 +27,7 @@ spring:
       force: true
 jwt:
   secret:
-    key: sdfuidjf23jASjdAakjdfhajdhfad1234Ad843ajkdfASDFgadfd43
+    key: ${JWT_SECRET_KEY}
 cloud:
   aws:
     s3:
@@ -42,7 +42,9 @@ cloud:
 spotify:
   client-id: ${CLIENT_ID}
   client-secret: ${CLIENT_SECRET}
-  redirect-uri: http://127.0.0.1:5173/login/load
+  redirect-uri:
+    local: ${SPOTIFY_LOCAL_REDIRECT_URI}
+    deploy: ${SPOTIFY_DEPLOY_REDIRECT_URI}
   auth-uri: https://accounts.spotify.com/authorize
   token-uri: https://accounts.spotify.com/api/token
   user-info-uri: https://api.spotify.com/v1/me

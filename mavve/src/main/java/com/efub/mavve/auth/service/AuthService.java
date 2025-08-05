@@ -19,6 +19,7 @@ import com.efub.mavve.global.exception.MavveException;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,6 +38,7 @@ public class AuthService {
     private final long REFRESH_EXPIRE = 1000L * 60 * 60 * 24 * 14;
     private final JwtResolver jwtResolver;
     private final TokenService tokenService;
+    private final Environment environment;
 
     public SpotifyRedirctUri getRedirctUri() {
         return SpotifyRedirctUri.of(oauthClient.getRedirectUri());
@@ -45,7 +47,8 @@ public class AuthService {
     @Transactional
     public void loginOrRegisterUser(SpotifyCodeRequest request, HttpServletResponse response){
         String code = request.getCode();
-        SpotifyUserInfoResponse userInfoResponse = oauthClient.requestOauthInfo(code);
+        String environment = request.getEnvironment();
+        SpotifyUserInfoResponse userInfoResponse = oauthClient.requestOauthInfo(code, environment);
 
         if(existedBySpotifyUserId(userInfoResponse.getId())){
             // 존재하는 유저이므로 로그인
