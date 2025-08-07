@@ -57,7 +57,7 @@
   </tr>
   <tr>
     <td align="center">방 CRUD api 개발, 한줄일기 CRUD api 개발</td>
-    <td align="center">방 진입, 실시간 음악 재생 관련 웹소켓 api 개발</td>
+    <td align="center">방 진입, 실시간 음악 재생 및 채팅 관련 웹소켓 api 개발</td>
     <td align="center">플레이리스트 CRUD api 개발, 배포</td>
     <td align="center">유저 관련 api 개발, 곡 api 개발, 배포</td>
   </tr>
@@ -103,12 +103,15 @@
 │   │   │   │   ├── controller/
 │   │   │   │   ├── service/
 │   │   │   │   ├── repository/
+│   │   │   │   ├── dto/
 │   │   │   │   └── entity/
 │   │   │
 │   │   │   ├── room/                    # 🏷️ 방 도메인  
 │   │   │   │   ├── controller/
 │   │   │   │   ├── service/
 │   │   │   │   ├── repository/
+│   │   │   │   ├── dto/
+│   │   │   │   ├── payload/
 │   │   │   │   └── entity/
 │   │   │
 │   │   │
