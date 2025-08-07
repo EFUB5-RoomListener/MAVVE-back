@@ -14,6 +14,9 @@ public interface RoomRepository extends JpaRepository<Room, Long> {
     // Room Id로 조회하기
     Optional<Room> findByRoomId(long roomId);
 
+    // 최신순 조회
+    List<Room> findAllByOrderByRoomIdDesc();
+
     // 사용자의 방 리스트
     List<Room> findByUser(User user);
 
