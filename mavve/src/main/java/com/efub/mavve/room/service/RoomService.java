@@ -78,7 +78,7 @@ public class RoomService {
     // 공개된 방 리스트 전체 조회
     @Transactional(readOnly = true)
     public RoomListResponse getListRoom(User user) {
-        List<Room> roomList = roomRepository.findAll();
+        List<Room> roomList = roomRepository.findAllByOrderByRoomIdDesc();
 
         List<RoomResponse> responseList = roomList.stream().filter(Room::isPublic)
                 .map(room -> {
