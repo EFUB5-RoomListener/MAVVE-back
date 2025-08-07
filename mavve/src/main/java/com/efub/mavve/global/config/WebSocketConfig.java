@@ -12,13 +12,16 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 
 @Configuration
 @EnableWebSocketMessageBroker
-@RequiredArgsConstructor
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     private final StompHandler stompHandler;
-
-    @Value("${frontend.domain-uri}")
     private final String frontendDomain;
+
+    public WebSocketConfig(StompHandler stompHandler,
+                           @Value("${frontend.domain-uri}") String frontendDomain) {
+        this.stompHandler = stompHandler;
+        this.frontendDomain = frontendDomain;
+    }
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {
@@ -32,10 +35,8 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
                 .setAllowedOriginPatterns(frontendDomain);
     }
 
-    //헤더로 전달된 jwt 인증
     @Override
     public void configureClientInboundChannel(ChannelRegistration registration) {
         registration.interceptors(stompHandler);
     }
-
 }
