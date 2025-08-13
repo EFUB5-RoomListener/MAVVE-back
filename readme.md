@@ -1,4 +1,3 @@
-
 <div align="center">
   <h1>🌊MAVVE - Backend</h1>
   <p>EFUB 5기 SWS 3팀 "Mavve" 프로젝트 백엔드 레포지토리입니다.</p>
@@ -15,9 +14,27 @@
 음악 플레이리스트, 한줄 일기를 기반으로 다른 유저와 교감할 수 있어요.
 
 ## 🗓️ 개발 기간
-- 2025.07.07 ~
+- 2025.07.07 ~ 2025.08.08
 
 ## 💡 주요 기능
+
+<div align="center">
+
+<!-- 1행 -->
+<img src="https://github.com/user-attachments/assets/bd30faa2-c905-4f42-a125-6ebc59ac4919" width="45%">
+<img src="https://github.com/user-attachments/assets/ecd4c399-79b3-4f58-841e-4b00dab9ba28" width="45%">
+
+<!-- 줄바꿈 -->
+<br>
+
+<!-- 2행 -->
+<img src="https://github.com/user-attachments/assets/054ac552-1ec9-4028-a08e-f23be5e666b3" width="45%">
+<img src="https://github.com/user-attachments/assets/3f8fa636-bc72-4228-bf8a-1d9be584923d" width="45%">
+<br>
+<img src="https://github.com/user-attachments/assets/bae639dc-a4f1-459f-a70f-998ec30b9897" width="90%">
+
+</div>
+
 
 ## 🔧 아키텍처
 <img width="1920" height="1080" alt="mavve_sys_ar" src="https://github.com/user-attachments/assets/6ec7083c-43ab-478a-b5b8-9a2c28aeef7c" />
